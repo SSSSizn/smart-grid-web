@@ -1,0 +1,66 @@
+.table-container {
+    margin: 20px;
+}
+
+.table-title {
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.high-load {
+    background-color: #ffcccc !important;
+}
+
+.low-load {
+    background-color: #ccffcc !important;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+}
+
+.error-message {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.chart-controls {
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+
+.chart-controls button {
+    margin: 0 5px;
+}
+
+.chart-container {
+    position: relative;
+    height: 500px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: white;
+}
+
+/* 添加Bootstrap图标支持 */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
