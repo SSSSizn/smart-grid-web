@@ -45,7 +45,7 @@ def read_and_expand_excel(file_path, sheet_name='Sheet1'):
                     data[i-1][j-1] = value
 
     # 转为 DataFrame
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data)   
     df.columns = df.iloc[0]
     df = df[1:].reset_index(drop=True)
     return df
@@ -71,6 +71,7 @@ def process_excel_data():
         problem_df = problem_df.fillna('')
 
         return problem_df
+
 
     except Exception as e:
         print(f"读取文件错误: {e}")
