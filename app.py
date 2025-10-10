@@ -20,41 +20,18 @@ matplotlib.rcParams['font.sans-serif'] = ['SimHei']  # 黑体
 matplotlib.rcParams['axes.unicode_minus'] = False    # 解决负号显示问题
 import pandas as pd
 
-def read_and_expand_excel(file_path, sheet_name='Sheet1'):
+def read_excel(file_path, sheet_name='Sheet1'):
     """
-    读取 Excel 并拆分合并单元格，把原本被合并的单元格内容复制到所有合并的行/列
-    仅针对原本有值的合并单元格，其他空白列保持空
+    直接读取Excel文件，不需要处理合并单元格
     """
-
-    wb = load_workbook(file_path, data_only=True)
-    ws = wb[sheet_name]
-
-    # 创建二维列表存储原始值
-    data = [[cell.value for cell in row] for row in ws.iter_rows()]
-
-    # 遍历合并单元格区域
-    for merged_range in ws.merged_cells.ranges:
-        min_row, min_col, max_row, max_col = merged_range.bounds
-        value = ws.cell(row=min_row, column=min_col).value
-        if value is None:
-            continue  # 原本合并的单元格如果为空就不填充
-        # 填充原本为空的合并单元格
-        for i in range(min_row, max_row + 1):
-            for j in range(min_col, max_col + 1):
-                if data[i-1][j-1] is None:
-                    data[i-1][j-1] = value
-
-    # 转为 DataFrame
-    df = pd.DataFrame(data)   
-    df.columns = df.iloc[0]
-    df = df[1:].reset_index(drop=True)
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
     return df
 
 
 def process_excel_data():
     """读取并处理Excel数据，拆分合并单元格，只返回重载或轻载线路"""
     try:
-        df = read_and_expand_excel('test.xlsx', sheet_name='Sheet1')
+        df = read_excel('test.xlsx', sheet_name='Sheet1')
 
         # 问题线路条件：重载≥90%，轻载≤25%
         problem_conditions = (
