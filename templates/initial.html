@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>操作台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+</head>
+<body>
+  <!-- 左侧目录 -->
+  <div class="sidebar">
+    <h2>目录</h2>
+    <ul>
+      <li class="has-submenu">第二章  配电网现状分析
+        <ul class="submenu">
+          <li class="has-submenu">一、高压配电网现状分析
+            <ul class="submenu">
+              <li class="has-submenu">（一）电网总体概况</li>
+              <li class="has-submenu">（二）装备水平分析</li>
+              <li class="has-submenu">（三）运行水平分析</li>
+            </ul>
+          </li>
+          <li class="has-submenu">二、中低压配电网现状分析
+            <ul class="submenu">
+              <li class="has-submenu">（一）供电能力
+                <ul class="submenu">
+                  <li>1、人均（户均）配变容量</li>
+                  <li>2、配变负载情况</li>
+                  <li id="line-load">3、配电线路负载情况</li>
+                </ul>
+              </li>
+              <li class="has-submenu">（二）供电保障
+                <ul class="submenu">
+                  <li>1、县域联系情况</li>
+                  <li>2、乡镇供电</li>
+                  <li>3、村庄供电</li>
+                  <li>4、居民小区</li>
+                  <li>5、重要用户</li>
+                </ul>
+              </li>
+              <li class="has-submenu">（三）绿色协调
+                <ul class="submenu">
+                  <li class="has-submenu">1、承载能力
+                    <ul class="submenu">
+                      <li>（1）分布式电源承载能力</li>
+                      <li>（2）设备反向重过载情况</li>
+                      <li>（3）充电桩基础设施承载能力</li>
+                    </ul>
+                  </li>
+                  <li>2、协调水平</li>
+                </ul>
+              </li>
+              <li class="has-submenu">（四）供电质量
+                <ul class="submenu">
+                  <li>1、供电可靠性</li>
+                  <li class="has-submenu">2、停电分析
+                    <ul class="submenu">
+                      <li>（1）线路停电</li>
+                      <li>（2）台区停电</li>
+                      <li>（3）工单及投诉</li>
+                    </ul>
+                  </li>
+                  <li>3、电压质量</li>
+                  <li>4、电压越限分析</li>
+                </ul>
+              </li>
+              <li class="has-submenu">（五）网架结构
+                <ul class="submenu">
+                  <li class="has-submenu">1、10千伏电网网架
+                    <ul class="submenu">
+                        <li>1）核心指标分析</li>
+                        <li>2）线路分段情况分析</li>
+                        <li>3）大分支情况分析</li>
+                        <li>4）供电半径分析</li>
+                        <li>5）线路跨网格供电</li>
+                        <li>6）线路N-1校验</li>
+                        <li>7）开关配置情况</li>
+                      </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="has-submenu">（六）装备水平
+                <ul class="submenu">
+                  <li class="has-submenu">1、配变
+                    <ul class="submenu">
+                        <li>1）配变型号</li>
+                        <li>2）电网规模</li>
+                        <li>3）线路型号</li>
+                        <li>4）台区供电半径</li>
+                    </ul>
+                  </li>
+                  <li class="has-submenu">2、配电线路
+                    <ul class="submenu">
+                        <li>1）10kV线路运行年限</li>
+                        <li>2）干线线规分析</li>
+                        <li>3）线路装接配变容量情况</li>
+                        <li>4）台区供电半径</li>
+                    </ul>
+                  </li>
+                  <li>3、开关设施</li>
+                </ul>
+              </li>
+              <li class="has-submenu">（七）运行效率
+                <ul class="submenu">
+                  <li class="has-submenu">1、线损情况
+                    <ul class="submenu">
+                        <li>（1）分压线损</li>
+                        <li>（2）分线线损</li>
+                        <li>（3）台区线损</li>
+                      </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>（八）数智水平</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 中间+右侧 -->
+  <div class="content">
+    <div class="main-view" id="main-view">
+      <iframe id="content-frame" src="" frameborder="0" style="width: 150%;height:100%;border:none;display:none;"></iframe>
+      <div id="placeholder">请选择左侧目录中的栏目...</div>
+    </div>
+    <div class="analysis-panel" id="analysis-panel">
+      <h3>分析条目</h3>
+      <button>变电站名称</button>
+      <button>线路名称</button>
+      <button>限额电路</button>
+      <button>2024年最大电流</button>
+      <button>2024年最大负载率</button>
+      <button>轻载/重载原因</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script2.js') }}"></script>
+</body>
+</html>
