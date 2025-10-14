@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>操作台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+</head>
+<body>
+  <!-- 左侧目录 -->
+  <div class="sidebar">
+    <h2>目录</h2>
+    <ul>
+      <li class="has-submenu">第二章  配电网现状分析
+        <ul class="submenu">
+          <li>表2-1 xx网格35kV及以上变电站基本情况表</li>
+          <li>表2-2 xx网格35kV及以上变电站基本情况表</li>
+          <li>表2-3 低压电网规模一览表</li>
+          <li>表2-4 配变负载率明细表</li>
+          <li id="line-load">表2-5 中压线路负载率明细表</li>
+          <li>表2-6 高层小区明细表</li>
+          <li>表2-7 河东新区网格现状分布式光伏接入情况</li>
+          <li>表2-8* 充电桩基础设施承载能力</li>
+          <li>表2-8 xx网格现在充电基础设统计表</li>
+          <li>表 供电可靠性</li>
+          <li>表 频繁停电线路</li>
+          <li>表2-9  xx网格10kV线路停电明细表</li>
+          <li>表2-10 xx网格台区停电统计表</li>
+          <li>表2-11 xx网格台区越上限统计表</li>
+          <li>表2-12 xx网格台区越下限统计表</li>
+          <li>表2-13 网格中压线路网架基本情况</li>
+          <li>表2-14 中压线路联络情况统计表</li>
+          <li>表2-15 中压线路分段情况统计表</li>
+          <li>表2-16 中压线路大分支情况统计表</li>
+          <li>表2-17 中压线路供电半径超标明细表</li>
+          <li>表2-18 中压线路N-1校验结果汇总表</li>
+          <li>表2-19 公变情况分布表</li>
+          <li>表2-20 xx网格0.4kV线路规模</li>
+          <li>表2-21 xx网格0.4kV供电半径明细表</li>
+          <li>表2-22 10kV线路投运时间统计表</li>
+          <li>表2-23 中压线路干线型号统计表</li>
+          <li>表2-24 线路装接配变容量分布情况</li>
+          <li>表2-28 中压线路分线线损情况明细表</li>
+          <li>表2-29 xx网格台区线损情况</li>
+          <li>表2-30 10kV线路配自终端明细表</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 中间+右侧 -->
+  <div class="content">
+    <div class="main-view" id="main-view">
+      <iframe id="content-frame" src="" frameborder="0" style="width:100%;height:100%;border:none;display:none;"></iframe>
+      <div id="placeholder">请选择左侧目录中的栏目...</div>
+    </div>
+    <div class="analysis-panel" id="analysis-panel">
+      <h3>分析条目</h3>
+      <button>变电站名称</button>
+      <button>线路名称</button>
+      <button>限额电路</button>
+      <button>2024年最大电流</button>
+      <button>2024年最大负载率</button>
+      <button>轻载/重载原因</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script2.js') }}"></script>
+</body>
+</html>

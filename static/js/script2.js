@@ -1,13 +1,13 @@
 // 点击展开/收起子菜单
 document.querySelectorAll(".has-submenu").forEach(item => {
-  item.addEventListener("click", function(e) {
+  item.addEventListener("click", function (e) {
     e.stopPropagation();
     this.classList.toggle("active");
   });
 });
 
 // 点击“配电线路负载情况”显示右侧内容
-document.getElementById("line-load").addEventListener("click", function(e) {
+document.getElementById("line-load").addEventListener("click", function (e) {
   e.stopPropagation();
 
   const iframe = document.getElementById("content-frame");
