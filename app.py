@@ -24,7 +24,7 @@ matplotlib.rcParams['font.sans-serif'] = ['SimHei']  # 黑体
 matplotlib.rcParams['axes.unicode_minus'] = False    # 解决负号显示问题
 
 # 文字保存路径
-SAVE_DIR = "saved_pages"
+SAVE_DIR = "saved_texts"
 
 os.makedirs(SAVE_DIR, exist_ok=True)
 
