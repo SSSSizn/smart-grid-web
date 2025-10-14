@@ -19,6 +19,7 @@ app = Flask(__name__)
 matplotlib.rcParams['font.sans-serif'] = ['SimHei']  # 黑体
 matplotlib.rcParams['axes.unicode_minus'] = False    # 解决负号显示问题
 import pandas as pd
+from docx.shared import Pt, Inches
 
 def read_excel(file_path, sheet_name='Sheet1'):
     """
@@ -58,7 +59,7 @@ def process_excel_data():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('initial copy.html')
 
 
 @app.route('/api/problem-lines')
@@ -71,8 +72,10 @@ def api_problem_lines():
         'total': len(result)
     })
 
+@app.route('/line-load')
+def line_load():
+    return render_template('index.html')
 
-from docx.shared import Pt, Inches
 
 @app.route('/export-word')
 def export_word():
@@ -157,4 +160,4 @@ def export_word():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
