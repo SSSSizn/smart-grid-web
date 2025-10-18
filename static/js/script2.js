@@ -1,3 +1,4 @@
+
 // 点击展开/收起子菜单
 document.querySelectorAll(".has-submenu").forEach(item => {
   item.addEventListener("click", function (e) {
@@ -6,19 +7,28 @@ document.querySelectorAll(".has-submenu").forEach(item => {
   });
 });
 
-// 点击“配电线路负载情况”显示右侧内容
-document.getElementById("line-load").addEventListener("click", function (e) {
-  e.stopPropagation();
+// 点击具体“表”时，加载对应iframe + 显示分析面板
+document.querySelectorAll("li[data-url]").forEach(item => {
+  item.addEventListener("click", function (e) {
+    e.stopPropagation();
 
-  const iframe = document.getElementById("content-frame");
-  const placeholder = document.getElementById("placeholder");
-  const analysisPanel = document.getElementById("analysis-panel");
+    const iframe = document.getElementById("content-frame");
+    const placeholder = document.getElementById("placeholder");
+    const allPanels = document.querySelectorAll(".analysis-panel");
 
-  // 设置iframe显示内容
-  iframe.src = "/line-load";  // 👈 这是你第一个页面的文件名
-  iframe.style.display = "block";
-  placeholder.style.display = "none";
+    // 隐藏所有分析区
+    allPanels.forEach(p => p.style.display = "none");
 
-  // 显示右侧分析区
-  analysisPanel.style.display = "block";
+    // 设置iframe内容
+    const url = this.getAttribute("data-url");
+    iframe.src = url;
+    iframe.style.display = "block";
+    placeholder.style.display = "none";
+
+    // 显示对应分析区
+    const panelId = this.getAttribute("data-panel");
+    const panel = document.getElementById(panelId);
+    if (panel) panel.style.display = "block";
+  });
 });
+

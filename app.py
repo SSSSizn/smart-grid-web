@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import pandas as pd
 from docx.shared import Pt, Inches
+from flask import abort
 matplotlib.use('Agg')  # 设置为非交互式后端
 
 from openpyxl.reader.excel import load_workbook
@@ -66,6 +67,9 @@ def process_excel_data():
         print(f"读取文件错误: {e}")
         return pd.DataFrame()
 
+@app.route('/')
+def home():
+    return render_template('2-5_version1.html')
 
 @app.route('/api/problem-lines')  
 def api_problem_lines():
@@ -77,9 +81,14 @@ def api_problem_lines():
         'total': len(result)
     })
 
-@app.route('/line-load')
-def line_load():
-    return render_template('2-5.html')
+@app.route('/<page_id>')
+def dynamic_page(page_id):
+    """根据URL自动匹配对应模板"""
+    template_path = os.path.join(app.template_folder, f"{page_id}.html")
+    if os.path.exists(template_path):
+        return render_template(f"{page_id}.html")
+    else:
+        return render_template("not_found.html", page_id=page_id), 404
 
 @app.route('/export/<page_id>')
 def export_word(page_id):
