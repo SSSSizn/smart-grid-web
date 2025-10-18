@@ -14,5 +14,9 @@
     {% for page in pages %}
         <a href="{{ url_for('page', page_id=page) }}">进入页面：{{ page }}</a>
     {% endfor %}
+
+    <h2>数据表查看</h2>
+
+        <a href="{{ url_for('all_sheets') }}">查看所有数据表</a>
 </body>
 </html>

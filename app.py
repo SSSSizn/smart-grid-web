@@ -214,5 +214,36 @@ def index():
     return render_template('index.html', pages=pages)
 
 
+@app.route('/api/sheets')
+def get_sheets():
+    """获取Excel文件中所有sheet的名称"""
+    try:
+        xls = pd.ExcelFile('data/收资清单填充结果1.xlsx')
+        sheet_names = xls.sheet_names
+        return jsonify(sheet_names)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/sheet/<sheet_name>')
+def get_sheet_data(sheet_name):
+    """获取指定sheet的数据"""
+    try:
+        # 读取指定sheet的数据
+        df = pd.read_excel('data/收资清单填充结果1.xlsx', sheet_name=sheet_name)
+        # 处理NaN值
+        df = df.fillna('')
+        # 转换为JSON格式
+        data = df.to_dict('records')
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# 添加新路由
+@app.route('/all_sheets')
+def all_sheets():
+    """展示所有sheet的页面"""
+    return render_template('all_sheets.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
