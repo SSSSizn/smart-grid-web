@@ -102,3 +102,83 @@ body {
   background: #f0f0f0;
   border-color: #bbb;
 }
+/* 表格样式 */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.table th, .table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f5f5f5;
+}
+/* 在style2.css中添加 */
+.analysis-panel button.active {
+    background-color: #e0e0ff;
+    border-color: #9999ff;
+}
+/* static/style.css */
+
+/* ... 您原有的样式 ... */
+
+/* --- 新增/修改位置：为列控制按钮添加样式 --- */
+
+#analysis-panel button {
+    display: block;
+    width: 90%;
+    margin: 5px auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 4px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#analysis-panel button:hover {
+    background-color: #eef;
+}
+
+/* 按钮激活状态（列可见） */
+#analysis-panel button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+/* 按钮非激活状态（列隐藏） */
+#analysis-panel button:not(.active) {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #ced4da;
+    text-decoration: line-through; /* 添加删除线效果 */
+}
+
+/* 左侧导航激活状态 */
+#nav-menu a.active {
+    background-color: #0056b3;
+    color: white;
+    font-weight: bold;
+}
