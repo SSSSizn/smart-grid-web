@@ -15,6 +15,7 @@ from io import BytesIO
 import pandas as pd
 from docx.shared import Pt, Inches
 from flask import abort
+from werkzeug.utils import secure_filename
 
 matplotlib.use('Agg')  # 设置为非交互式后端
 
@@ -31,22 +32,68 @@ SAVE_DIR = "saved_texts"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 
+
+# 配置上传目录
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'xlsx'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# 确保上传目录存在
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "没有文件部分"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "未选择文件"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # 更新全局Excel文件路径
+        global EXCEL_FILE
+        EXCEL_FILE = filepath
+
+        return jsonify({
+            "success": True,
+            "message": "文件上传成功",
+            "filename": filename
+        })
+
+    return jsonify({"error": "不支持的文件类型"}), 400
+
+
 def get_save_path(page_id):
     return os.path.join(SAVE_DIR, f"{page_id}.txt")
 
 
-def read_excel(file_path, sheet_name='Sheet1'):
+def read_excel(file_path = None, sheet_name='Sheet1'):
     """
     直接读取Excel文件，不需要处理合并单元格
     """
-    df = pd.read_excel(file_path, sheet_name=sheet_name)
-    return df
+    if file_path is None:
+        file_path = EXCEL_FILE
+
+    if not file_path or not os.path.exists(file_path):
+        raise FileNotFoundError("Excel文件未上传或不存在")
+
+    return pd.read_excel(file_path, sheet_name=sheet_name)
 
 
 def process_excel_data():
     """读取并处理Excel数据，拆分合并单元格，只返回重载或轻载线路"""
     try:
-        df = read_excel('test.xlsx', sheet_name='Sheet1')
+        df = read_excel()
 
         # 问题线路条件：重载≥90%，轻载≤25%
         problem_conditions = (
@@ -69,10 +116,6 @@ def process_excel_data():
         print(f"读取文件错误: {e}")
         return pd.DataFrame()
 
-
-# @app.route('/')
-# def home():
-#     return render_template('version1.html')
 
 
 @app.route('/api/problem-lines')
@@ -230,8 +273,6 @@ def index():
     return render_template('index.html', pages=pages)
 
 
-# 在文件顶部添加Excel文件路径
-EXCEL_FILE = 'data/收资清单填充结果1.xlsx'
 
 # ---定义完整的表格配置字典 ---
 # 这是整个系统的核心配置，请务必根据您的实际文档和Excel文件仔细填写
@@ -434,8 +475,10 @@ def get_sheets():
 def get_sheet_data(sheet_name):
     """获取指定sheet的数据"""
     try:
-        # 读取指定sheet的数据
-        df = pd.read_excel('data/收资清单填充结果1.xlsx', sheet_name=sheet_name)
+        if not EXCEL_FILE:
+            return jsonify({'error': '请先上传Excel文件'}), 400
+
+        df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_name)
         # 处理NaN值
         df = df.fillna('')
         # 转换为JSON格式

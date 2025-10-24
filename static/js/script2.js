@@ -265,3 +265,37 @@ document.addEventListener('DOMContentLoaded', () => {
         button.classList.toggle('active');
     }
 });
+// 上传文件逻辑
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('file', document.getElementById('fileInput').files[0]);
+
+  try {
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    const statusDiv = document.getElementById('uploadStatus');
+
+    if (result.success) {
+      statusDiv.textContent = `上传成功: ${result.filename}`;
+      statusDiv.style.color = 'green';
+
+      // 刷新当前显示的表格
+      const currentFrame = document.getElementById('content-frame');
+      if (currentFrame.src) {
+        currentFrame.src = currentFrame.src; // 强制刷新iframe
+      }
+    } else {
+      statusDiv.textContent = `上传失败: ${result.error}`;
+      statusDiv.style.color = 'red';
+    }
+  } catch (error) {
+    document.getElementById('uploadStatus').textContent = `上传出错: ${error.message}`;
+    document.getElementById('uploadStatus').style.color = 'red';
+  }
+});

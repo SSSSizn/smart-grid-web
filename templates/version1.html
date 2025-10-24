@@ -6,6 +6,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
 </head>
 <body>
+<!-- 上传示例 -->
+<div class="upload-container">
+  <h2>Excel文件上传</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" accept=".xlsx" required>
+    <button type="submit">上传文件</button>
+  </form>
+  <div id="uploadStatus"></div>
+</div>
   <!-- 左侧目录 -->
 <div class="sidebar">
   <h2>目录</h2>

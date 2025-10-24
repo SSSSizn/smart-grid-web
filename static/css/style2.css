@@ -182,3 +182,18 @@ body {
     color: white;
     font-weight: bold;
 }
+/* 上传文件 */
+.upload-container {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+#uploadStatus {
+  margin-top: 10px;
+  color: green;
+}
