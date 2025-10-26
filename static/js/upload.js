@@ -1,11 +1,8 @@
+// 修改 smart-grid-web/static/js/upload.js
 document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
     const startUploadBtn = document.getElementById('startUploadBtn');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
     const message = document.getElementById('message');
 
     let selectedFiles = [];
@@ -44,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 处理选择的文件
+    // 处理选择的文件 - 仅做简单验证，不实际上传
     function handleFiles(files) {
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
@@ -58,43 +55,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // 检查是否已选择该文件
             if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
                 selectedFiles.push(file);
-                addFileToUI(file, selectedFiles.length - 1);
             }
         }
 
         updateUploadButtonState();
-    }
 
-    // 添加文件到UI
-    function addFileToUI(file, index) {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-            <span>${file.name} (${formatFileSize(file.size)})</span>
-            <button class="file-remove" data-index="${index}">&times;</button>
-        `;
-        fileList.appendChild(fileItem);
-
-        // 添加删除事件
-        fileItem.querySelector('.file-remove').addEventListener('click', function() {
-            const idx = parseInt(this.getAttribute('data-index'));
-            selectedFiles.splice(idx, 1);
-            fileList.innerHTML = '';
-            selectedFiles.forEach((file, i) => addFileToUI(file, i));
-            updateUploadButtonState();
-        });
+        // 选择文件后自动启用上传按钮并显示提示
+        if (selectedFiles.length > 0) {
+            showMessage(`已选择 ${selectedFiles.length} 个文件，点击上传按钮继续`, 'success');
+        }
     }
 
     // 更新上传按钮状态
     function updateUploadButtonState() {
         startUploadBtn.disabled = selectedFiles.length === 0;
-    }
-
-    // 格式化文件大小
-    function formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + ' B';
-        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-        else return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
     // 显示消息
@@ -106,58 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
-    // 开始上传
+    // 开始上传按钮点击事件 - 不实际上传，直接跳转
     startUploadBtn.addEventListener('click', function() {
         if (selectedFiles.length === 0) return;
 
-        const formData = new FormData();
-        selectedFiles.forEach(file => {
-            formData.append('files', file);
-        });
+        showMessage('文件正在处理中，即将跳转到数据表页面...', 'success');
 
-        uploadProgress.style.display = 'block';
-        progressBar.style.width = '0%';
-        progressText.textContent = '0%';
-
-        fetch('/upload', {
-            method: 'POST',
-            body: formData,
-            onUploadProgress: function(e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    progressText.textContent = percent + '%';
-                }
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('上传失败');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                showMessage('文件上传成功', 'success');
-                // 清空选择的文件
-                selectedFiles = [];
-                fileList.innerHTML = '';
-                updateUploadButtonState();
-                // 3秒后跳转到数据表页面
-                setTimeout(() => {
-                    window.location.href = '/all_sheets';
-                }, 1000);
-            } else {
-                showMessage(data.message || '上传失败', 'error');
-            }
-        })
-        .catch(error => {
-            showMessage(error.message, 'error');
-        })
-        .finally(() => {
-            setTimeout(() => {
-                uploadProgress.style.display = 'none';
-            }, 1000);
-        });
+        // 1秒后跳转到数据表页面
+        setTimeout(() => {
+            window.location.href = '/version1';
+        }, 1000);
     });
 });

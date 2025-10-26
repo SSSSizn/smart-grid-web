@@ -4,8 +4,14 @@
   <meta charset="UTF-8">
   <title>操作台</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <!-- 新增：引入导航栏样式-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
 </head>
 <body>
+<!-- 上传示例 -->
+  <!-- 新增：导航栏放在页面最顶部 -->
+  {% include 'navbar.html' %}
   <!-- 左侧目录 -->
 <div class="sidebar">
   <h2>目录</h2>
@@ -81,8 +87,8 @@
                     <li>（2）设备反向重过载情况</li>
                     <li class="has-submenu">（3）充电桩基础设施承载能力
                       <ul class="submenu">
-                        <li data-url="/table2-8*" data-panel="analysis-panel8*">表2-8* 充电桩基础设施承载能力</li>
-                        <li data-url="/table2-8" data-panel="analysis-panel8">表2-8 xx网格现状充电基础设施统计表</li>
+                        <li data-url="/table2-8" data-panel="analysis-panel8">表2-8 充电桩基础设施承载能力</li>
+                        <li data-url="/table2-9" data-panel="analysis-panel8">表2-9 xx网格现状充电基础设施统计表</li>
                       </ul>
                     </li>
                   </ul>
@@ -95,7 +101,7 @@
               <ul class="submenu">
                 <li class="has-submenu">1、供电可靠性
                   <ul class="submenu">
-                    <li data-url="/table2-kekaoxing" data-panel="analysis-panel-kekaoxing">表 供电可靠性</li>
+                    <li data-url="/table2-10" data-panel="analysis-panel10">表2-10 供电可靠性</li>
                   </ul>
                 </li>
 
@@ -103,14 +109,14 @@
                   <ul class="submenu">
                     <li class="has-submenu">（1）线路停电
                       <ul class="submenu">
-                        <li data-url="/table2-pinfan" data-panel="analysis-panel-pinfan">表 频繁停电线路</li>
-                        <li data-url="/table2-9" data-panel="analysis-panel9">表2-9 xx网格10kV线路停电明细表</li>
+                        <li data-url="/table2-11" data-panel="analysis-panel11">表2-11 频繁停电线路</li>
+                        <li data-url="/table2-12" data-panel="analysis-panel12">表2-12 xx网格10kV线路停电明细表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">（2）台区停电
                       <ul class="submenu">
-                        <li data-url="/table2-10" data-panel="analysis-panel10">表2-10 xx网格台区停电统计表</li>
+                        <li data-url="/table2-13" data-panel="analysis-panel13">表2-13 xx网格台区停电统计表</li>
                       </ul>
                     </li>
 
@@ -121,8 +127,8 @@
                 <li>3、电压质量</li>
                 <li class="has-submenu">4、电压越限分析
                   <ul class="submenu">
-                    <li data-url="/table2-11" data-panel="analysis-panel11">表2-11 xx网格台区越上限统计表</li>
-                    <li data-url="/table2-12" data-panel="analysis-panel12">表2-12 xx网格台区越下限统计表</li>
+                    <li data-url="/table2-14" data-panel="analysis-panel14">表2-14 xx网格台区越上限统计表</li>
+                    <li data-url="/table2-15" data-panel="analysis-panel15">表2-15 xx网格台区越下限统计表</li>
                   </ul>
                 </li>
               </ul>
@@ -134,26 +140,26 @@
                   <ul class="submenu">
                     <li class="has-submenu">1）核心指标分析
                       <ul class="submenu">
-                        <li data-url="/table2-13" data-panel="analysis-panel13">表2-13 网格中压线路网架基本情况</li>
-                        <li data-url="/table2-14" data-panel="analysis-panel14">表2-14 中压线路联络情况统计表</li>
+                        <li data-url="/table2-16" data-panel="analysis-panel16">表2-16 网格中压线路网架基本情况</li>
+                        <li data-url="/table2-17" data-panel="analysis-panel17">表2-17 中压线路联络情况统计表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">2）线路分段情况分析
                       <ul class="submenu">
-                        <li data-url="/table2-15" data-panel="analysis-panel15">表2-15 中压线路分段情况统计表</li>
+                        <li data-url="/table2-18" data-panel="analysis-panel18">表2-18 中压线路分段情况统计表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">3）大分支情况分析
                       <ul class="submenu">
-                        <li data-url="/table2-16" data-panel="analysis-panel16">表2-16 中压线路大分支情况统计表</li>
+                        <li data-url="/table2-19" data-panel="analysis-panel19">表2-19 中压线路大分支情况统计表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">4）供电半径分析
                       <ul class="submenu">
-                        <li data-url="/table2-17" data-panel="analysis-panel17">表2-17 中压线路供电半径超标明细表</li>
+                        <li data-url="/table2-20" data-panel="analysis-panel20">表2-20 中压线路供电半径超标明细表</li>
                       </ul>
                     </li>
 
@@ -161,7 +167,7 @@
 
                     <li class="has-submenu">6）线路N-1校验
                       <ul class="submenu">
-                        <li data-url="/table2-18" data-panel="analysis-panel18">表2-18 中压线路N-1校验结果汇总表</li>
+                        <li data-url="/table2-21" data-panel="analysis-panel21">表2-21 中压线路N-1校验结果汇总表</li>
                       </ul>
                     </li>
 
@@ -177,18 +183,18 @@
                   <ul class="submenu">
                     <li class="has-submenu">1）配变型号
                       <ul class="submenu">
-                        <li data-url="/table2-19" data-panel="analysis-panel19">表2-19 公变情况分布表</li>
+                        <li data-url="/table2-22" data-panel="analysis-panel22">表2-22 公变情况分布表</li>
                       </ul>
                     </li>
                     <li class="has-submenu">2）电网规模
                       <ul class="submenu">
-                        <li data-url="/table2-20" data-panel="analysis-panel20">表2-20 xx网格0.4kV线路规模</li>
+                        <li data-url="/table2-23" data-panel="analysis-panel23">表2-23 xx网格0.4kV线路规模</li>
                       </ul>
                     </li>
                     <li>3）线路型号</li>
                     <li class="has-submenu">4）台区供电半径
                       <ul class="submenu">
-                        <li data-url="/table2-21" data-panel="analysis-panel21">表2-21 xx网格0.4kV供电半径明细表</li>
+                        <li data-url="/table2-24" data-panel="analysis-panel24">表2-24 xx网格0.4kV供电半径明细表</li>
                       </ul>
                     </li>
                   </ul>
@@ -198,19 +204,19 @@
                   <ul class="submenu">
                     <li class="has-submenu">1）10kV线路运行年限
                       <ul class="submenu">
-                        <li data-url="/table2-22" data-panel="analysis-panel22">表2-22 10kV线路投运时间统计表</li>
+                        <li data-url="/table2-25" data-panel="analysis-panel25">表2-25 10kV线路投运时间统计表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">2）干线线规分析
                       <ul class="submenu">
-                        <li data-url="/table2-23" data-panel="analysis-panel23">表2-23 中压线路干线型号统计表</li>
+                        <li data-url="/table2-26" data-panel="analysis-panel26">表2-26 中压线路干线型号统计表</li>
                       </ul>
                     </li>
 
                     <li class="has-submenu">3）线路装接配变容量情况
                       <ul class="submenu">
-                        <li data-url="/table2-24" data-panel="analysis-panel24">表2-24 线路装接配变容量分布情况</li>
+                        <li data-url="/table2-27" data-panel="analysis-panel27">表2-27 线路装接配变容量分布情况</li>
                       </ul>
                     </li>
 
@@ -257,137 +263,167 @@
 
   <!-- 中间+右侧 -->
   <div class="content">
+    <!-- 左/中之间可拖拽的分割条 -->
+    <div id="resizer-left" class="resizer"></div>
+
     <div class="main-view" id="main-view">
-      <iframe id="content-frame" src="" frameborder="0" style="width: 150%;height:100%;border:none;display:none;"></iframe>
+      <iframe id="content-frame" src="" frameborder="0" style="width: 100%;height:100%;border:none;display:none;"></iframe>
       <div id="placeholder">请选择左侧目录中的栏目...</div>
     </div>
-    <div class="analysis-panel" id="analysis-panel5">
+
+    <!-- 主视图区和分析区之间的分隔（分析区被包裹到 .analysis-wrapper） -->
+    <div id="resizer-inner" class="resizer"></div>
+
+    <div class="analysis-wrapper">
+      <div class="analysis-panel" id="analysis-panel1">
       <h3>分析条目</h3>
       <button>变电站名称</button>
-      <button>线路名称</button>
-      <button>限额电路</button>
-      <button>2024年最大电流</button>
-      <button>2024年最大负载率</button>
-      <button>轻载/重载原因</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel1">
-      <h3>分析条目</h3>
-      <button>变电站名称</button>
-      <button>总容量</button>
+      <button>额定容量（MVA）</button>
       <button>主变编号</button>
-      <button>主变容量</button>
-      <button>10kV馈线间隔</button>
+      <button>主变容量（MVA）</button>
+      <button>10kV馈线间隔总数</button>
+      <button>10kV馈线间隔已使用</button>
+      <button>10kV馈线间隔剩余</button>
       <button>未来可扩展间隔数</button>
       <button>备注</button>
-      
+
     </div>
-    <div class="analysis-panel" id="analysis-panel2">
+  <div class="analysis-panel" id="analysis-panel2">
       <h3>分析条目</h3>
       <button>变电站名称</button>
-      <button>总容量</button>
+      <button>额定容量（MVA）</button>
       <button>主变编号</button>
-      <button>主变容量</button>
-      <button>主变典型日负荷</button>
-      <button>主变典型日负载率</button>
-      <button>主变年最大负荷</button>
-      <button>主变年最大负载率</button>
+      <button>主变容量（MVA）</button>
+      <button>主变典型日负荷（MW）</button>
+      <button>主变典型日负载率（%）</button>
+      <button>主变年最大负荷（MW）</button>
+      <button>主变年最大负载率（%）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel3">
+  <div class="analysis-panel" id="analysis-panel3">
       <h3>分析条目</h3>
-      <button>网格</button>
-      <button>供区类型</button>
-      <button>指标分项</button>
-      <button>数值</button>
+      <button>供电网格名称</button>
+      <button>供电区域类型</button>
+      <button>公变数量（台）</button>
+      <button>用户数（万户）</button>
+      <button>户均配变容量（kVA/户）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel4">
+  <div class="analysis-panel" id="analysis-panel4">
       <h3>分析条目</h3>
       <button>设备名称</button>
       <button>电压等级</button>
       <button>所属馈线</button>
-      <button>额定容量</button>
-      <button>配变负载率</button>
+      <button>额定容量(kVA)</button>
+      <button>配变负载率（%）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel6">
+      <div class="analysis-panel" id="analysis-panel5">
+      <h3>分析条目</h3>
+      <button>变电站名称</button>
+      <button>线路名称</button>
+      <button>限额电流（A）</button>
+      <button>2024年最大电流（A）</button>
+      <button>2024年最大负载率（%）</button>
+      <button>轻载/重载原因</button>
+    </div>
+  <div class="analysis-panel" id="analysis-panel6">
       <h3>分析条目</h3>
       <button>高层小区名称</button>
       <button>供电线路名称</button>
-      <button>外线是否形成双电源</button>
-      <button>进线是否形成双电源</button>
+      <button>外线是否双电源</button>
+      <button>进线是否双电源</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel7">
+  <div class="analysis-panel" id="analysis-panel7">
       <h3>分析条目</h3>
       <button>光伏名称</button>
       <button>台区名称</button>
-      <button>电压等级</button>
-      <button>装机容量</button>
-      <button>2024年发电量</button>
-      <button>2024年上网电量</button>
+      <button>电压等级（kV）</button>
+      <button>装机容量（kW）</button>
+      <button>2024年发电量（kWh）</button>
+      <button>2024年上网电量（kWh）</button>
       <button>发电量消纳方式</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel8*">
+  <div class="analysis-panel" id="analysis-panel8">
       <h3>分析条目</h3>
       <button>充电设施名称</button>
       <button>所属线路</button>
-      <button>属性（交流、直流）</button>
-      <button>属性（公司建设、居民申请、社会运营）</button>
-      <button>装机容量</button>
+      <button>属性1</button>
+      <button>属性2</button>
+      <button>装机容量（kW）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel8">
+  <div class="analysis-panel" id="analysis-panel9">
       <h3>分析条目</h3>
       <button>充电设施用户类型</button>
       <button>交流桩总个数</button>
-      <button>交流总额定功率</button>
+      <button>交流总额定功率（kW）</button>
       <button>直流桩总个数</button>
-      <button>直流总额定功率</button>
+      <button>直流总额定功率（kW）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel9">
+  <div class="analysis-panel" id="analysis-panel10">
       <h3>分析条目</h3>
-      <button>线路名称</button>
-      <button>变电站名称</button>
+      <button>台区名称</button>
+      <button>所属线路</button>
+      <button>持续时间（min）</button>
       <button>停电类型</button>
+      <button>停电户数</button>
+      <button>故障查找时间（h）</button>
+    </div>
+      <div class="analysis-panel" id="analysis-panel11">
+      <h3>分析条目</h3>
+      <button>所属线路</button>
+      <button>停电次数</button>
+      <button>停电类型（故障停电/计划停电）</button>
+      <button>停电原因分析</button>
+      <button>持续时间（min）</button>
+    </div>
+  <div class="analysis-panel" id="analysis-panel12">
+      <h3>分析条目</h3>
+      <button>所属线路</button>
+      <button>变电站名称</button>
+      <button>停电类型（故障停电/计划停电）</button>
       <button>停电开始时间</button>
       <button>停电终止时间</button>
-      <button>持续时间</button>
+      <button>持续时间（min）</button>
       <button>停电描述</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel10">
+  <div class="analysis-panel" id="analysis-panel13">
       <h3>分析条目</h3>
       <button>台区名称</button>
       <button>所属线路</button>
       <button>2024年停电次数</button>
-      <button>停电总时长</button>
+      <button>停电总时长（分钟）</button>
       <button>停电类别（台区自身停电/线路停电引起）</button>
-      <button>停电原因分类</button>
-      <button>停电原因</button>
+      <button>停电类型（故障停电/计划停电）</button>
+      <button>停电原因分析</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel11">
+
+  <div class="analysis-panel" id="analysis-panel14">
       <h3>分析条目</h3>
       <button>台区名称</button>
-      <button>容量</button>
-      <button>台区越上限电压</button>
-      <button>越上限时长</button>
+      <button>容量kVA</button>
+      <button>台区越上限电压(V)</button>
+      <button>越上限时长（h）</button>
       <button>越上限户数</button>
       <button>是否越上限</button>
       <button>是否存在电压三相不平衡</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel12">
+
+  <div class="analysis-panel" id="analysis-panel15">
       <h3>分析条目</h3>
       <button>台区名称</button>
-      <button>容量</button>
-      <button>台区越上限电压</button>
-      <button>越下限时长</button>
+      <button>容量kVA</button>
+      <button>台区越上限电压(V)</button>
+      <button>越下限时长（h）</button>
       <button>越下限户数</button>
       <button>是否越下限</button>
       <button>是否存在电压三相不平衡</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel13">
+  <div class="analysis-panel" id="analysis-panel16">
       <h3>分析条目</h3>
-      <button>公用线路</button>
-      <button>联络率</button>
-      <button>站间联络率</button>
-      <button>2典型接线比例</button>
+      <button>线路总条数（条）</button>
+      <button>联络率（%）</button>
+      <button>站间联络率（%）</button>
+      <button>典型接线比例（%）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel14">
+  <div class="analysis-panel" id="analysis-panel17">
       <h3>分析条目</h3>
       <button>变电站名称</button>
       <button>线路名称</button>
@@ -396,102 +432,114 @@
       <button>联络线路2</button>
       <button>是否为标准接线</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel15">
+  <div class="analysis-panel" id="analysis-panel18">
       <h3>分析条目</h3>
       <button>线路名称</button>
-      <button>供电半径</button>
+      <button>供电半径（km）</button>
       <button>分段数</button>
-      <button>分段1</button>
-      <button>分段2</button>
-      <button>分段3</button>
-      <button>分段4</button>
-      <button>分段5</button>
-      <button>分段6</button>
+      <button>分段1容量（kVA）</button>
+      <button>分段1台数（台）</button>
+      <button>分段2容量（kVA）</button>
+      <button>分段2台数（台）</button>
+      <button>分段3容量（kVA）</button>
+      <button>分段3台数（台）</button>
+      <button>分段4容量（kVA）</button>
+      <button>分段4台数（台）</button>
+      <button>分段5容量（kVA）</button>
+      <button>分段5台数（台）</button>
+      <button>分段6容量（kVA）</button>
+      <button>分段6台数（台）</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel16">
+  <div class="analysis-panel" id="analysis-panel19">
       <h3>分析条目</h3>
       <button>线路名称</button>
       <button>大分支名称</button>
-      <button>容量</button>
-      <button>2024年最大电流值</button>
+      <button>容量（kVA）</button>
+      <button>2024年最大电流值（A）</button>
       <button>备注</button>
     </div>
-    </div>
-    <div class="analysis-panel" id="analysis-panel17">
+  </div>
+  <div class="analysis-panel" id="analysis-panel20">
       <h3>分析条目</h3>
       <button>变电站</button>
       <button>线路名称</button>
-      <button>供电半径</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel18">
+      <button>供电半径（km）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel21">
       <h3>分析条目</h3>
       <button>线路名称</button>
       <button>接线方式</button>
-      <button>限额电流</button>
-      <button>典型日电流</button>
-      <button>联络线路名称</button>
-      <button>最大转供能力</button>
-      <button>N-1通过</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel19">
+      <button>限额电流（A）</button>
+      <button>典型日电流（A）</button>
+      <button>联络线路1</button>
+      <button>线路1转供裕度</button>
+      <button>联络线路2</button>
+      <button>线路2转供裕度</button>
+      <button>最大转供能力（A）</button>
+      <button>N-1校验结果</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel22">
       <h3>分析条目</h3>
       <button>配变型号</button>
       <button>配变容量</button>
       <button>运行年限</button>
-      <button>数量</button>
-      <button>占比</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel20">
+      <button>数量（台）</button>
+      <button>占比（%）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel23">
       <h3>分析条目</h3>
       <button>供电区域</button>
-      <button>总长度</button>
-      <button>电缆线路长度</button>
-      <button>架空线路长度</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel21">
+      <button>总长度（km）</button>
+      <button>电缆线路长度（km）</button>
+      <button>裸导线长度（km）</button>
+      <button>绝缘线长度（km）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel24">
       <h3>分析条目</h3>
       <button>设备名称</button>
       <button>电压等级</button>
       <button>所属馈线</button>
-      <button>额定容量</button>
-      <button>供电半径</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel22">
+      <button>额定容量（kVA）</button>
+      <button>供电半径（m）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel25">
       <h3>分析条目</h3>
       <button>线路名称</button>
       <button>所属变电站</button>
       <button>线路类型</button>
       <button>所属单元</button>
-      <button>运行年限</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel23">
+      <button>运行年限（年）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel26">
       <h3>分析条目</h3>
       <button>线路名称</button>
-      <button>限额电路</button>
       <button>所属变电站</button>
-      <button>干线线规</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel24">
+      <button>架空线</button>
+      <button>电缆线</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel27">
       <h3>分析条目</h3>
-      <button>装接配变容量区间</button>
-      <button>线路条数</button>
-      <button>比例</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel28">
+      <button>装接配变容量区间（MVA）</button>
+      <button>线路条数（条）</button>
+      <button>比例（%）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel28">
       <h3>分析条目</h3>
       <button>变电站名称</button>
       <button>线路名称</button>
-      <button>线损率</button>
+      <button>线损率（%）</button>
       <button>备注：是否为高损线路</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel29">
+  </div>
+  <div class="analysis-panel" id="analysis-panel29">
       <h3>分析条目</h3>
       <button>公用配变总台数</button>
-      <button>公用配变线损率平均值</button>
-      <button>高损台区</button>
-      <button>负损台区</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel-30">
+      <button>公用配变线损率平均值（%）</button>
+      <button>高损台区台数（台）</button>
+      <button>高损台区比例（%）</button>
+      <button>负损台区台数（台）</button>
+      <button>负损台区比例（%）</button>
+  </div>
+  <div class="analysis-panel" id="analysis-panel30">
       <h3>分析条目</h3>
       <button>名称</button>
       <button>类型</button>
@@ -503,23 +551,21 @@
       <button>开关类型</button>
       <button>投运时间</button>
     </div>
-    <div class="analysis-panel" id="analysis-panel-kekaoxing">
-      <h3>分析条目</h3>
-      <button>台区名称</button>
-      <button>所属线路</button>
-      <button>持续时间</button>
-      <button>停电类型</button>
-      <button>停电户数</button>
-      <button>故障查找时间</button>
-    </div>
-    <div class="analysis-panel" id="analysis-panel-pinfan">
-      <h3>分析条目</h3>
-      <button>线路名称</button>
-      <button>停电次数</button>
-      <button>停电类型</button>
-      <button>停电原因分析</button>
-      <button>持续时间</button>
-    </div>
+      <!-- 上传控件：位于分析区右下角 -->
+      <div class="upload-container upload-card">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <label class="file-label">
+            <input type="file" id="fileInput" name="file" accept=".xlsx" required>
+            <span class="file-text">选择 Excel 文件 (.xlsx)</span>
+          </label>
+          <div class="upload-actions">
+            <button type="submit" class="upload-btn"><i class="fa fa-upload"></i> 上传</button>
+            <button type="button" class="export-btn" title="导出当前表格（未实现）"><i class="fa fa-download"></i> 全部导出</button>
+          </div>
+          <div id="uploadStatus" class="upload-status"></div>
+        </form>
+      </div>
+    </div> <!-- .analysis-wrapper -->
   </div>
  <script src="{{ url_for('static', filename='js/script2.js') }}"></script>
 </body>

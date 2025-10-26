@@ -371,43 +371,43 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/upload', methods=['POST'])
-def upload_files():
-    """处理文件上传"""
-    # 检查登录状态
-    if 'user' not in session:
-        return jsonify({'success': False, 'message': '请先登录'}), 401
-
-    # 检查是否有文件被上传
-    if 'files' not in request.files:
-        return jsonify({'success': False, 'message': '没有文件被上传'})
-
-    files = request.files.getlist('files')
-
-    # 处理每个上传的文件
-    for file in files:
-        # 检查文件是否符合要求
-        if file.filename == '':
-            return jsonify({'success': False, 'message': '存在未命名的文件'})
-
-        if file and allowed_file(file.filename):
-            # 确保文件名安全
-            filename = secure_filename(file.filename)
-            # 保存文件到上传目录
-            file_path = os.path.join(UPLOAD_DIR, filename)
-
-            # 如果文件已存在，添加序号避免覆盖
-            counter = 1
-            while os.path.exists(file_path):
-                name, ext = os.path.splitext(filename)
-                file_path = os.path.join(UPLOAD_DIR, f"{name}_{counter}{ext}")
-                counter += 1
-
-            file.save(file_path)
-        else:
-            return jsonify({'success': False, 'message': f'文件 {file.filename} 类型不支持，仅支持 .xlsx 和 .xls 格式'})
-
-    return jsonify({'success': True, 'message': '文件上传成功'})
+# @app.route('/upload', methods=['POST'])
+# def upload_files():
+#     """处理文件上传"""
+#     # 检查登录状态
+#     if 'user' not in session:
+#         return jsonify({'success': False, 'message': '请先登录'}), 401
+#
+#     # 检查是否有文件被上传
+#     if 'files' not in request.files:
+#         return jsonify({'success': False, 'message': '没有文件被上传'})
+#
+#     files = request.files.getlist('files')
+#
+#     # 处理每个上传的文件
+#     for file in files:
+#         # 检查文件是否符合要求
+#         if file.filename == '':
+#             return jsonify({'success': False, 'message': '存在未命名的文件'})
+#
+#         if file and allowed_file(file.filename):
+#             # 确保文件名安全
+#             filename = secure_filename(file.filename)
+#             # 保存文件到上传目录
+#             file_path = os.path.join(UPLOAD_DIR, filename)
+#
+#             # 如果文件已存在，添加序号避免覆盖
+#             counter = 1
+#             while os.path.exists(file_path):
+#                 name, ext = os.path.splitext(filename)
+#                 file_path = os.path.join(UPLOAD_DIR, f"{name}_{counter}{ext}")
+#                 counter += 1
+#
+#             file.save(file_path)
+#         else:
+#             return jsonify({'success': False, 'message': f'文件 {file.filename} 类型不支持，仅支持 .xlsx 和 .xls 格式'})
+#
+#     return jsonify({'success': True, 'message': '文件上传成功'})
 
 
 @app.route('/upload', methods=['GET'])

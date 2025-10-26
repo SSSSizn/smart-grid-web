@@ -3,6 +3,7 @@ body {
     background-color: #f8f9fa;
 }
 
+/* 修改 sidebar 样式（原样式中添加top值） */
 .sidebar {
     width: 280px;
     background-color: #343a40;
@@ -12,7 +13,7 @@ body {
     overflow-y: auto;
     position: fixed;
     left: 0;
-    top: 0;
+    top: 60px; /* 导航栏高度约60px，调整侧边栏顶部位置 */
 }
 
 .sidebar h2 {
@@ -45,9 +46,11 @@ body {
     background-color: #0d6efd;
 }
 
+/* 修改 content 样式（添加顶部间距） */
 .content {
     margin-left: 300px;
     padding: 20px;
+    margin-top: 70px; /* 避开导航栏 */
 }
 
 .table-container {
@@ -89,6 +92,6 @@ body {
     color: white;
     padding: 20px;
     border-radius: 8px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-align: center;
 }
