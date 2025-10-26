@@ -101,6 +101,7 @@ def read_excel(file_path = None, sheet_name='Sheet1'):
 
 
 def process_excel_data():
+    # 有问题！！ 在导出文件时用到了此函数，但是是针对某个表格写的，要做泛化
     """读取并处理Excel数据，拆分合并单元格，只返回重载或轻载线路"""
     try:
         df = read_excel()
@@ -153,8 +154,7 @@ def dynamic_page(page_id):
 
 @app.route('/export/<page_id>')
 def export_word(page_id):
-    # 检查登录状态
-    """导出Word文件，包含表格、图表和页面文本内容"""
+    """导出单个表格的文件，包含表格、*图表和页面文本内容"""
     # 1. 处理Excel数据生成表格和图表
     df = process_excel_data()
 
@@ -213,46 +213,12 @@ def export_word(page_id):
                     for run in paragraph.runs:
                         run.font.size = Pt(9)
 
-        # 第三部分：图表
-        import matplotlib.pyplot as plt
-        from io import BytesIO
-
-        # 柱状图
-        plt.figure(figsize=(10, 6))
-        top10 = df.nlargest(10, '2024年线路最大负载率（%）')
-        plt.bar(top10['线路名称'], top10['2024年线路最大负载率（%）'], color='#0d6efd')
-        plt.xticks(rotation=45, ha='right')
-        plt.ylabel("负载率（%）")
-        plt.title("前10条线路负载率情况")
-        buf1 = BytesIO()
-        plt.tight_layout()
-        plt.savefig(buf1, format="png", dpi=150)
-        plt.close()
-        buf1.seek(0)
-        doc.add_picture(buf1, width=Inches(5.5))
-
-        # 饼图
-        plt.figure(figsize=(8, 6))
-        heavy = (df['2024年线路最大负载率（%）'] >= 90).sum()
-        light = (df['2024年线路最大负载率（%）'] <= 25).sum()
-        plt.pie([heavy, light], labels=['重载', '轻载'], autopct='%1.1f%%', colors=['#dc3545', '#198754'])
-        plt.title("重载/轻载占比")
-        buf2 = BytesIO()
-        plt.savefig(buf2, format="png", dpi=150)
-        plt.close()
-        buf2.seek(0)
-        doc.add_picture(buf2, width=Inches(5.5))
-    else:
-        # 如果没有数据，添加提示
-        doc.add_heading("数据分析", level=1)
-        doc.add_paragraph("暂无数据分析内容。")
-
     # 保存到内存流
     out_stream = BytesIO()
     doc.save(out_stream)
     out_stream.seek(0)
 
-    return send_file(out_stream, as_attachment=True, download_name=f"{page_id}_完整报告.docx")
+    return send_file(out_stream, as_attachment=True, download_name=f"{page_id}_表格报告.docx")
 
 
 @app.route('/export-pdf/<page_id>')
@@ -744,12 +710,21 @@ def show_table(table_id):
 
     try:
         df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+        
+        # 读取页面文本内容
+        save_path = get_save_path(table_id)
+        try:
+            with open(save_path, "r", encoding="utf-8") as f:
+                text = f.read()
+        except FileNotFoundError:
+            text = "暂无内容，可以点击编辑并保存。"
+
         # 只保留配置中指定的列
         existing_columns = [col for col in config['columns'] if col in df.columns]
         df = df[existing_columns]
         df = df.fillna('')
         table_html = df.to_html(classes='table table-striped table-hover', index=False, table_id='data-table')
-        return render_template('table_template.html', table_html=table_html, title=config['title'])
+        return render_template('table_template.html', table_html=table_html, title=config['title'], text=text, page_id=table_id)
     except Exception as e:
         return f"读取表格出错: {str(e)}", 500
 

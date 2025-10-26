@@ -322,3 +322,73 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
         }, {passive:true});
     });
 })();
+
+let currentTableId = null;
+
+document.querySelectorAll("li[data-url]").forEach(item => {
+    item.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        // 1. 获取 data-url
+        const url = this.getAttribute('data-url'); // "/table2-11"
+
+        // 2. 从 url 中提取 tableId（如 "2-11"）
+        const match = url.match(/\/table(\d+-\d+)/);
+        currentTableId = match ? match[1] : null;
+
+        if (!currentTableId) {
+            console.warn('无法解析 tableId:', url);
+            alert('页面配置错误，无法识别表格ID');
+            return;
+        }
+
+        console.log('当前选中的 tableId:', currentTableId);
+
+        // 3. 更新菜单高亮
+        document.querySelectorAll("li[data-url]").forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+
+        // 4. 加载 iframe
+        const iframe = document.getElementById("content-frame");
+        const placeholder = document.getElementById("placeholder");
+
+        iframe.src = url;
+        iframe.style.display = "block";
+        placeholder.style.display = "none";
+
+        // 5. 显示对应的分析面板
+        const allPanels = document.querySelectorAll(".analysis-panel");
+        allPanels.forEach(p => p.style.display = "none");
+
+        const panelId = this.getAttribute("data-panel");
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            panel.style.display = "block";
+            panel.querySelectorAll('button').forEach(btn => {
+                btn.style.backgroundColor = '#fafafa';
+            });
+        }
+    });
+});
+
+// 导出按钮点击事件
+document.getElementById('export-btn').addEventListener('click', function() {
+    if (!currentTableId) {
+        alert('请先选择一个表格页面');
+        return;
+    }
+
+    console.log('正在导出 tableId:', currentTableId);
+
+    // 构造导出接口 URL
+    const exportUrl = `/export/${encodeURIComponent(currentTableId)}`;
+
+    // 创建临时 a 标签触发下载
+    const a = document.createElement('a');
+    a.href = exportUrl;
+    a.download = ''; // 不指定文件名，由后端决定
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+});

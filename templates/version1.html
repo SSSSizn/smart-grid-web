@@ -281,9 +281,9 @@
       <h3>分析条目</h3>
       <button>变电站名称</button>
       <button>额定容量（MVA）</button>
-      <button>主变编号</button>
-      <button>主变容量</button>
-      <button>10kV馈线间隔</button>
+      <button>10kV馈线间隔总数</button>
+      <button>10kV馈线间隔已使用</button>
+      <button>10kV馈线间隔剩余</button>
       <button>未来可扩展间隔数</button>
       <button>备注</button>
 
@@ -293,7 +293,6 @@
       <button>变电站名称</button>
       <button>额定容量（MVA）</button>
       <button>主变编号</button>
-      <button>主变容量（MVA）</button>
       <button>主变典型日负荷（MW）</button>
       <button>主变典型日负载率（%）</button>
       <button>主变年最大负荷（MW）</button>
@@ -560,7 +559,8 @@
           </label>
           <div class="upload-actions">
             <button type="submit" class="upload-btn"><i class="fa fa-upload"></i> 上传</button>
-            <button type="button" class="export-btn" title="导出当前表格（未实现）"><i class="fa fa-download"></i> 全部导出</button>
+            <!-- 加上 id="export-btn" -->
+            <button type="button" class="export-btn" id="export-btn"><i class="fa fa-download"></i> 单文件导出</button>
           </div>
           <div id="uploadStatus" class="upload-status"></div>
         </form>
