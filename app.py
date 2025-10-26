@@ -1,6 +1,6 @@
 import os
 import docx
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, send_file, session, redirect, url_for
 import pandas as pd
 from io import BytesIO
 from docx import Document
@@ -149,26 +149,6 @@ def dynamic_page(page_id):
         return render_template(f"{page_id}.html")
     else:
         return render_template("not_found.html", page_id=page_id), 404
-
-
-@app.route('/all_sheets')
-def all_sheets():
-    """展示所有数据表的页面"""
-    # 检查登录状态（与其他路由保持一致的权限控制）
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    # 渲染all_sheets.html模板
-    return render_template('all_sheets.html')
-
-
-@app.route('/version1')
-def version1():
-    """展示version1页面（表格分析页面）"""
-    # 检查登录状态（与其他路由保持一致的权限控制）
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    # 渲染version1.html模板
-    return render_template('version1.html')
 
 
 @app.route('/export/<page_id>')
@@ -346,8 +326,12 @@ def save_text(page_id):
 @app.route('/')
 def index():
     """首页，列出所有页面链接"""
+    if 'user' not in session:
+        return redirect(url_for('login'))  # 没登录跳转到登录页
+
     pages = ['2-5', '3-3']
     return render_template('index.html', pages=pages)
+
 
 
 # 登录页面路由
