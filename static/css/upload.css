@@ -1,0 +1,178 @@
+/* 导航栏样式 */
+.navbar {
+    background-color: #3498db;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-logo {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.navbar-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn {
+    background-color: #e74c3c;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b !important;
+}
+
+/* 上传区域样式 */
+.upload-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+.upload-container h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+.upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 60px 20px;
+    text-align: center;
+    background-color: white;
+    transition: border-color 0.3s, background-color 0.3s;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #3498db;
+    background-color: #f9f9f9;
+}
+
+.upload-icon {
+    font-size: 48px;
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+.browse-btn {
+    color: #3498db;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.file-format {
+    color: #777;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.file-list {
+    margin: 30px 0;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.file-remove {
+    color: #e74c3c;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.upload-progress {
+    height: 8px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #3498db;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 5px;
+    color: #666;
+    font-size: 14px;
+}
+
+.start-upload-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 12px 30px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-upload-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.start-upload-btn:not(:disabled):hover {
+    background-color: #2980b9;
+}
+
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    display: none;
+}
+
+.message.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+    display: block;
+}
+
+.message.error {
+    background-color: #f2dede;
+    color: #a94442;
+    display: block;
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告预览 - 智能电网分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="report-container">
+        <div class="report-header">
+            <h1>智能电网分析报告</h1>
+            <div class="report-actions">
+                <button id="exportWord" class="export-btn">
+                    <i class="bi bi-file-word"></i> 导出为Word
+                </button>
+                <button id="exportPdf" class="export-btn">
+                    <i class="bi bi-file-pdf"></i> 导出为PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="report-filters">
+            <h3>报告选项</h3>
+            <div class="filter-group">
+                <label>
+                    <input type="checkbox" checked data-table="table2-1"> 表2-1 变电站基本情况表
+                </label>
+                <label>
+                    <input type="checkbox" checked data-table="table2-2"> 表2-2 变电站负载情况表
+                </label>
+                <label>
+                    <input type="checkbox" checked data-table="table2-3"> 表2-3 低压电网规模一览表
+                </label>
+                <label>
+                    <input type="checkbox" checked data-table="table2-5"> 表2-5 中压线路负载率明细表
+                </label>
+                <!-- 更多表格选项 -->
+            </div>
+
+            <div class="date-range">
+                <label for="startDate">开始日期:</label>
+                <input type="date" id="startDate">
+
+                <label for="endDate">结束日期:</label>
+                <input type="date" id="endDate">
+            </div>
+
+            <button id="generateReport" class="generate-btn">生成报告</button>
+        </div>
+
+        <div class="report-content" id="reportContent">
+            <div class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">加载中...</span>
+                </div>
+                <span>正在生成报告，请稍候...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成报告按钮点击事件
+            document.getElementById('generateReport').addEventListener('click', generateReport);
+
+            // 导出Word按钮点击事件
+            document.getElementById('exportWord').addEventListener('click', function() {
+                exportReport('word');
+            });
+
+            // 导出PDF按钮点击事件
+            document.getElementById('exportPdf').addEventListener('click', function() {
+                exportReport('pdf');
+            });
+
+            // 初始生成报告
+            generateReport();
+        });
+
+        // 生成报告
+        function generateReport() {
+            const reportContent = document.getElementById('reportContent');
+            reportContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                    <span>正在生成报告，请稍候...</span>
+                </div>
+            `;
+
+            // 获取选中的表格
+            const selectedTables = [];
+            document.querySelectorAll('.filter-group input:checked').forEach(checkbox => {
+                selectedTables.push(checkbox.getAttribute('data-table'));
+            });
+
+            // 获取日期范围
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // 模拟报告生成
+            setTimeout(() => {
+                fetch('/generate_report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        tables: selectedTables,
+                        start_date: startDate,
+                        end_date: endDate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        reportContent.innerHTML = data.report_html;
+                    } else {
+                        reportContent.innerHTML = `<div class="error-message">${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    reportContent.innerHTML = `<div class="error-message">生成报告失败: ${error.message}</div>`;
+                });
+            }, 1000);
+        }
+
+        // 导出报告
+        function exportReport(format) {
+            // 获取选中的表格
+            const selectedTables = [];
+            document.querySelectorAll('.filter-group input:checked').forEach(checkbox => {
+                selectedTables.push(checkbox.getAttribute('data-table'));
+            });
+
+            // 获取日期范围
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // 构建导出URL
+            let url = `/export_report?format=${format}`;
+            if (startDate) url += `&start_date=${startDate}`;
+            if (endDate) url += `&end_date=${endDate}`;
+            selectedTables.forEach(table => {
+                url += `&tables=${table}`;
+            });
+
+            // 跳转到导出URL
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>

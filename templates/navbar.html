@@ -1,0 +1,18 @@
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="{{ url_for('index') }}" class="navbar-logo">智能电网分析系统</a>
+
+        <div class="navbar-menu">
+            {% if 'user' in session %}
+                <a href="{{ url_for('index') }}">首页</a>
+                <a href="{{ url_for('upload') }}">数据上传</a>
+                <a href="{{ url_for('all_sheets') }}">所有数据展示</a>
+                <a href="{{ url_for('version1') }}">表格分析</a>
+                <a href="{{ url_for('report_preview') }}">报告预览</a>
+                <a href="{{ url_for('logout') }}" class="logout-btn">退出登录</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">登录</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
