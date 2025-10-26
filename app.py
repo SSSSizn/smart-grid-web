@@ -1,6 +1,6 @@
 import os
 import docx
-from flask import Flask, render_template, jsonify, request, send_file, session, redirect, url_for
+from flask import Flask, render_template, jsonify, request, send_file
 import pandas as pd
 from io import BytesIO
 from docx import Document
@@ -10,7 +10,10 @@ from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+import matplotlib.pyplot as plt
 from io import BytesIO
+import pandas as pd
+from docx.shared import Pt, Inches
 from flask import abort
 from werkzeug.utils import secure_filename
 from xhtml2pdf import pisa  # 导入xhtml2pdf
@@ -39,32 +42,68 @@ def html_to_pdf(html_content):
     return buffer
 
 
+
+# 配置上传目录
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'xlsx'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# 确保上传目录存在
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "没有文件部分"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "未选择文件"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # 更新全局Excel文件路径
+        global EXCEL_FILE
+        EXCEL_FILE = filepath
+
+        return jsonify({
+            "success": True,
+            "message": "文件上传成功",
+            "filename": filename
+        })
+
+    return jsonify({"error": "不支持的文件类型"}), 400
+
+
 def get_save_path(page_id):
     return os.path.join(SAVE_DIR, f"{page_id}.txt")
 
 
-def read_excel(file_path, sheet_name='Sheet1'):
+def read_excel(file_path = None, sheet_name='Sheet1'):
     """
     直接读取Excel文件，不需要处理合并单元格
     """
-    df = pd.read_excel(file_path, sheet_name=sheet_name)
-    return df
+    if file_path is None:
+        file_path = EXCEL_FILE
+
+    if not file_path or not os.path.exists(file_path):
+        raise FileNotFoundError("Excel文件未上传或不存在")
+
+    return pd.read_excel(file_path, sheet_name=sheet_name)
 
 
 def process_excel_data():
     """读取并处理Excel数据，拆分合并单元格，只返回重载或轻载线路"""
     try:
-        # 尝试从上传目录读取最新文件
-        upload_files = [f for f in os.listdir(UPLOAD_DIR) if f.endswith(('.xlsx', '.xls'))]
-        if upload_files:
-            # 按修改时间排序，取最新的
-            upload_files.sort(key=lambda x: os.path.getmtime(os.path.join(UPLOAD_DIR, x)), reverse=True)
-            file_path = os.path.join(UPLOAD_DIR, upload_files[0])
-        else:
-            # 回退到默认文件
-            file_path = 'test.xlsx'
-
-        df = read_excel(file_path, sheet_name='Sheet1')
+        df = read_excel()
 
         # 问题线路条件：重载≥90%，轻载≤25%
         problem_conditions = (
@@ -88,12 +127,10 @@ def process_excel_data():
         return pd.DataFrame()
 
 
+
 @app.route('/api/problem-lines')
 def api_problem_lines():
     # 检查登录状态
-    if 'user' not in session:
-        return jsonify({'success': False, 'message': '请先登录'}), 401
-
     problem_df = process_excel_data()
     result = problem_df.to_dict('records')
     return jsonify({
@@ -105,11 +142,8 @@ def api_problem_lines():
 
 @app.route('/<page_id>')
 def dynamic_page(page_id):
-    """根据URL自动匹配对应模板"""
     # 检查登录状态
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
+    """根据URL自动匹配对应模板"""
     template_path = os.path.join(app.template_folder, f"{page_id}.html")
     if os.path.exists(template_path):
         return render_template(f"{page_id}.html")
@@ -139,11 +173,8 @@ def version1():
 
 @app.route('/export/<page_id>')
 def export_word(page_id):
-    """导出Word文件，包含表格、图表和页面文本内容"""
     # 检查登录状态
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
+    """导出Word文件，包含表格、图表和页面文本内容"""
     # 1. 处理Excel数据生成表格和图表
     df = process_excel_data()
 
@@ -291,10 +322,6 @@ def export_pdf(page_id):
 @app.route('/page/<page_id>')
 def page(page_id):
     """加载指定页面的HTML"""
-    # 检查登录状态
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
     # 读取页面文本内容
     save_path = get_save_path(page_id)
     try:
@@ -310,10 +337,6 @@ def page(page_id):
 @app.route('/save/<page_id>', methods=['POST'])
 def save_text(page_id):
     """保存指定页面的文本"""
-    # 检查登录状态
-    if 'user' not in session:
-        return jsonify({"status": "error", "message": "请先登录"}), 401
-
     text = request.json.get("text", "")
     with open(get_save_path(page_id), "w", encoding="utf-8") as f:
         f.write(text)
@@ -323,10 +346,6 @@ def save_text(page_id):
 @app.route('/')
 def index():
     """首页，列出所有页面链接"""
-    # 检查登录状态
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
     pages = ['2-5', '3-3']
     return render_template('index.html', pages=pages)
 
@@ -602,10 +621,191 @@ EXCEL_FILE = 'data/收资清单填充结果1.xlsx'
 #     },
 #     'table-2-3': {
 #         'title': '表2-3 xx网格供电区域概况表',
-#         # ... 其他配置
-#     }
+#         'sheet_name': '供电区域概况表',
+#         'columns': [
+#             {'header': '网格', 'source': '网格名称'},
+#             {'header': '供区类型', 'source': '供区类型'},
+#             {'header': '指标分项', 'source': '指标'},
+#             {'header': '数值', 'source': '数值'},
+#             {'header': '单位', 'source': '单位'},
+#         ]
+#     },
+#     'table-3-1': {
+#         'title': '表3-1 xx网格10kV线路基本情况表',
+#         'sheet_name': '10kV线路基础信息表',
+#         'columns': [
+#             {'header': '线路名称', 'source': '线路名称'},
+#             {'header': '起点站', 'source': '起点变电站'},
+#             {'header': '联络点', 'source': '主要联络点'},
+#             {'header': '线路型号', 'source': '导线型号'},
+#             {'header': '线路长度', 'source': '线路长度'},
+#             {'header': '开关状态', 'source': '开关状态'},
+#         ]
+#     },
+#     # ... 在此继续添加其他表格的配置
 # }
+#
+# 3333
+# # ---  创建新的数据获取路由 ---
+# @app.route('/get_table_data/<table_id>')
+# def get_table_data(table_id):
+#     """
+#     根据table_id从配置中获取数据，并返回JSON格式
+#     """
+#     config = TABLE_CONFIG.get(table_id)
+#     if not config:
+#         return jsonify({'error': 'Table configuration not found'}), 404
+#
+#     try:
+#         # 1. 读取指定的Excel Sheet
+#         df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+#
+#         # 2. 提取需要的源列
+#         source_columns = [col['source'] for col in config['columns']]
+#
+#         # 检查所有需要的列是否存在
+#         missing_cols = [col for col in source_columns if col not in df.columns]
+#         if missing_cols:
+#             return jsonify({'error': f'Columns not found in Excel sheet: {", ".join(missing_cols)}'}), 400
+#
+#         filtered_df = df[source_columns]
+#
+#         # 3. 重命名列，使其与HTML表头一致
+#         # 创建一个从'source'到'header'的映射字典
+#         rename_map = {col['source']: col['header'] for col in config['columns']}
+#         filtered_df = filtered_df.rename(columns=rename_map)
+#
+#         # 4. 处理NaN值，避免前端显示问题
+#         filtered_df = filtered_df.fillna('')
+#
+#         # 5. 转换为JSON格式
+#         data = filtered_df.to_dict(orient='records')
+#         headers = [col['header'] for col in config['columns']]
+#
+#         return jsonify({
+#             'title': config['title'],
+#             'headers': headers,
+#             'data': data
+#         })
+#
+#     except FileNotFoundError:
+#         return jsonify({'error': f'Excel file not found at {EXCEL_FILE}'}), 500
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+#
+#
+# 22222
+# 添加sheet名称映射字典
+SHEET_MAPPING = {
+    'table2-1': '1高压变电站基础信息表',
+    'table2-2': '2供电区域概况表',
+    'table2-3': '3配变负载率明细表',
+    'table2-4': '4中压线路负载率表',
+    'table2-5': '5高层小区供电保障表',
+    'table2-6': '6分布式光伏接入情况表',
+    'table2-7': '7充电设施统计表',
+    'table2-8': '8台区停电明细表',
+    'table2-9': '9台区电压越限统计表',
+    'table2-10': '10中压线路网架表',
+    'table2-11': '11中压线路分段情况',
+    'table2-12': '12中压线路 N-1 校验表',
+    'table2-13': '13开关明细表',
+    'table2-14': '14配变明细表',
+    'table2-15': '15线路规模',
+    'table2-16': '16 0.4kV 台区供电半径表',
+    'table2-17': '17 10kV线路投运时间表',
+    'table2-18': '18线路分线线损情况明细表',
+    'table2-19': '19台区线损明细',
+    'table2-20': '20 10kV线路配自终端明细表',
+    'table2-21': '21线路跨网格供电情况',
+    'table2-22': '22线路装接配变容量',
+    'table2-23': '23配变情况分布表',
+    'table2-24': '24干线型号统计表',
+    'table2-25': '25环网柜明细表',
+    'table2-26': '26中压线路大分支情况',
+    'table2-27': '27中压线路供电半径',
+    'table2-28': '28线路状态检测',
+    'table2-29': '29问题清单汇总',
+    # 添加其他需要的映射...
+}
 
+
+# 添加通用表格路由
+# 在app.py顶部添加表格配置字典
+TABLE_CONFIG = {
+    '2-1': {
+        'sheet_name': '1高压变电站基础信息表',
+        'columns': ['序号', '变电站名称', '额定容量（MVA）', '主变编号', '10kV馈线间隔总数','10kV馈线间隔已使用', '10kV馈线间隔剩余','未来可扩展间隔数', '备注'],
+        'title': '表2-1 xx网格35kV及以上变电站基本情况表'
+    },
+    '2-2': {
+        'sheet_name': '1高压变电站基础信息表',
+        'columns': ['变电站名称', '额定容量（MVA）', '主变编号', '主变容量（MVA）', '主变典型日负荷（MW）', '主变典型日负载率（%）', '主变年最大负荷（MW）', '主变年最大负载率（%）'],
+        'title': '表2-2 xx网格35kV及以上变电站基本情况表'
+    },
+    '2-3': {
+        'sheet_name': '2供电区域概况表',
+        'columns': ['供电网格名称', '供电区域类型', '公变数量（台）', '用户数（万户）','户均配变容量（kVA/户）'],
+        'title': '表2-3 低压电网规模一览表'
+    },
+    # 添加其他表格配置...
+}
+
+# 修改通用表格路由
+@app.route('/table<path:table_id>')
+def show_table(table_id):
+    config = TABLE_CONFIG.get(table_id)
+    if not config:
+        return "未找到对应的表格", 404
+
+    try:
+        df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+        # 只保留配置中指定的列
+        existing_columns = [col for col in config['columns'] if col in df.columns]
+        df = df[existing_columns]
+        df = df.fillna('')
+        table_html = df.to_html(classes='table table-striped table-hover', index=False, table_id='data-table')
+        return render_template('table_template.html', table_html=table_html, title=config['title'])
+    except Exception as e:
+        return f"读取表格出错: {str(e)}", 500
+
+# 1111111
+
+@app.route('/api/sheets')
+def get_sheets():
+    """获取Excel文件中所有sheet的名称"""
+    try:
+        xls = pd.ExcelFile('data/收资清单填充结果1.xlsx')
+        sheet_names = xls.sheet_names
+        return jsonify(sheet_names)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/sheet/<sheet_name>')
+def get_sheet_data(sheet_name):
+    """获取指定sheet的数据"""
+    try:
+        if not EXCEL_FILE:
+            return jsonify({'error': '请先上传Excel文件'}), 400
+
+        df = pd.read_excel(EXCEL_FILE, sheet_name=sheet_name)
+        # 处理NaN值
+        df = df.fillna('')
+        # 转换为JSON格式
+        data = df.to_dict('records')
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# 添加新路由
+@app.route('/all_sheets')
+def all_sheets():
+    """展示所有sheet的页面"""
+    return render_template('all_sheets.html')
+@app.route('/version1')
+def version1():
+    """展示所有sheet的页面"""
+    return render_template('version1.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

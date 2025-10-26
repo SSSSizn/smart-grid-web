@@ -7,55 +7,7 @@ document.querySelectorAll(".has-submenu").forEach(item => {
   });
 });
 
-// 点击具体“表”时，加载对应iframe + 显示分析面板
-document.querySelectorAll("li[data-url]").forEach(item => {
-  item.addEventListener("click", function (e) {
-    e.stopPropagation();
-
-    const iframe = document.getElementById("content-frame");
-    const placeholder = document.getElementById("placeholder");
-    const allPanels = document.querySelectorAll(".analysis-panel");
-
-    // 隐藏所有分析区
-    allPanels.forEach(p => p.style.display = "none");
-
-    // 设置iframe内容
-    const url = this.getAttribute("data-url");
-    iframe.src = url;
-    iframe.style.display = "block";
-    placeholder.style.display = "none";
-
-    // 显示对应分析区
-    const panelId = this.getAttribute("data-panel");
-    const panel = document.getElementById(panelId);
-    if (panel) panel.style.display = "block";
-  });
-});
-
-// 在文件末尾添加表格加载处理
-document.querySelectorAll("li[data-url]").forEach(item => {
-  item.addEventListener("click", function (e) {
-    e.stopPropagation();
-
-    const iframe = document.getElementById("content-frame");
-    const placeholder = document.getElementById("placeholder");
-    const allPanels = document.querySelectorAll(".analysis-panel");
-
-    // 隐藏所有分析区
-    allPanels.forEach(p => p.style.display = "none");
-
-    // 设置iframe内容
-    const url = this.getAttribute("data-url");
-    iframe.src = url;
-    iframe.style.display = "block";
-    placeholder.style.display = "none";
-
-    // 显示对应分析区
-    const panelId = this.getAttribute("data-panel");
-    const panel = document.getElementById(panelId);
-    if (panel) panel.style.display = "block";
-  });
-});
+// （已合并）对含 data-url 的 li 统一在下方绑定处理，避免重复绑定
 // 在script2.js中添加以下代码
 document.getElementById("content-frame").onload = function() {
     const iframeDoc = this.contentDocument || this.contentWindow.document;
@@ -265,3 +217,108 @@ document.addEventListener('DOMContentLoaded', () => {
         button.classList.toggle('active');
     }
 });
+// 上传文件逻辑
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append('file', document.getElementById('fileInput').files[0]);
+
+  try {
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    const statusDiv = document.getElementById('uploadStatus');
+
+    if (result.success) {
+      statusDiv.textContent = `上传成功: ${result.filename}`;
+      statusDiv.style.color = 'green';
+
+      // 刷新当前显示的表格
+      const currentFrame = document.getElementById('content-frame');
+      if (currentFrame.src) {
+        currentFrame.src = currentFrame.src; // 强制刷新iframe
+      }
+    } else {
+      statusDiv.textContent = `上传失败: ${result.error}`;
+      statusDiv.style.color = 'red';
+    }
+  } catch (error) {
+    document.getElementById('uploadStatus').textContent = `上传出错: ${error.message}`;
+    document.getElementById('uploadStatus').style.color = 'red';
+  }
+});
+
+// 显示已选择的文件名称（用于隐藏的 file input）
+(function(){
+    const fileInputs = document.querySelectorAll('.upload-card input[type="file"]');
+    fileInputs.forEach(input => {
+        const wrapper = input.closest('.upload-card');
+        const display = wrapper ? wrapper.querySelector('.file-text') : null;
+        input.addEventListener('change', function(){
+            const file = (this.files && this.files.length) ? this.files[0] : null;
+            const name = file ? file.name : '未选择文件';
+            if (display) {
+                display.textContent = name;
+                display.title = name;
+            }
+        });
+    });
+})();
+
+// ---------- 可拖拽分隔条逻辑 ----------
+(function(){
+    const sidebar = document.querySelector('.sidebar');
+    const resizerLeft = document.getElementById('resizer-left');
+    const resizerInner = document.getElementById('resizer-inner');
+    const analysisWrapper = document.querySelector('.analysis-wrapper');
+    const body = document.body;
+
+    if (resizerLeft && sidebar) {
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+        resizerLeft.addEventListener('mousedown', (e) => {
+            isResizing = true; startX = e.clientX; startWidth = sidebar.getBoundingClientRect().width;
+            body.classList.add('no-select');
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const dx = e.clientX - startX;
+            let newWidth = startWidth + dx;
+            newWidth = Math.max(180, Math.min(700, newWidth));
+            sidebar.style.width = newWidth + 'px';
+        });
+        document.addEventListener('mouseup', () => { isResizing = false; body.classList.remove('no-select'); });
+    }
+
+    if (resizerInner && analysisWrapper) {
+        let isResizingInner = false;
+        let startX = 0;
+        let startWidth = 0;
+        resizerInner.addEventListener('mousedown', (e) => {
+            isResizingInner = true; startX = e.clientX; startWidth = analysisWrapper.getBoundingClientRect().width;
+            body.classList.add('no-select');
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizingInner) return;
+            const dx = e.clientX - startX;
+            // 向右拖动时减少宽度（因为鼠标位置增大）
+            let newWidth = startWidth - dx;
+            newWidth = Math.max(160, Math.min(700, newWidth));
+            analysisWrapper.style.width = newWidth + 'px';
+            analysisWrapper.style.flex = '0 0 ' + newWidth + 'px';
+        });
+        document.addEventListener('mouseup', () => { isResizingInner = false; body.classList.remove('no-select'); });
+    }
+
+    // 触控支持（移动端）
+    ['touchstart','touchmove','touchend'].forEach(evt => {
+        document.addEventListener(evt, function(e){
+            // prevent default handled in mousedown handlers via pointer capture is not used here; keep simple
+        }, {passive:true});
+    });
+})();

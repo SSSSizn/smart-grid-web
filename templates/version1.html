@@ -7,11 +7,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <!-- 新增：引入导航栏样式-->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+
 </head>
 <body>
 <!-- 上传示例 -->
   <!-- 新增：导航栏放在页面最顶部 -->
   {% include 'navbar.html' %}
+<!-- 上传示例 -->
   <!-- 左侧目录 -->
 <div class="sidebar">
   <h2>目录</h2>
@@ -280,10 +282,8 @@
       <button>变电站名称</button>
       <button>额定容量（MVA）</button>
       <button>主变编号</button>
-      <button>主变容量（MVA）</button>
-      <button>10kV馈线间隔总数</button>
-      <button>10kV馈线间隔已使用</button>
-      <button>10kV馈线间隔剩余</button>
+      <button>主变容量</button>
+      <button>10kV馈线间隔</button>
       <button>未来可扩展间隔数</button>
       <button>备注</button>
 
