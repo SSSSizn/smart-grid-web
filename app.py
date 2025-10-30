@@ -1,5 +1,9 @@
 import os
+import tempfile
+import uuid
+from datetime import datetime
 import docx
+import numpy as np
 from flask import Flask, render_template, jsonify, request, send_file, session, redirect, url_for
 import pandas as pd
 from io import BytesIO
@@ -332,13 +336,6 @@ def logout():
 
 # 数据上传路由
 ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
-
-
-def allowed_file(filename):
-    """检查文件是否为允许的类型"""
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 # @app.route('/upload', methods=['POST'])
 # def upload_files():
@@ -900,6 +897,324 @@ def all_sheets():
 def version1():
     """展示所有sheet的页面"""
     return render_template('version1.html')
+
+
+# === 报告预览相关路由 ===
+
+@app.route('/report')
+def report():
+    """报告预览页面"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('report.html')
+
+
+# 获取所有表格配置的路由
+@app.route('/api/table-configs')
+def get_table_configs():
+    """获取所有表格配置"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+
+    table_configs = []
+    for table_id, config in TABLE_CONFIG.items():
+        table_configs.append({
+            'id': table_id,
+            'title': config['title'],
+            'sheet_name': config['sheet_name']
+        })
+
+    return jsonify({
+        'success': True,
+        'data': table_configs
+    })
+
+
+@app.route('/api/generate-report-preview', methods=['POST'])
+def generate_report_preview():
+    """生成报告预览（HTML格式）"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+
+    data = request.get_json()
+    selected_tables = data.get('tables', [])
+
+    try:
+        # 生成HTML格式的报告预览
+        html_content = generate_html_report(selected_tables)
+
+        return jsonify({
+            'success': True,
+            'html_content': html_content,
+            'table_count': len(selected_tables)
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'生成报告预览时出错: {str(e)}'
+        }), 500
+
+
+def generate_html_report(selected_tables):
+    """生成HTML格式的报告内容"""
+    from datetime import datetime
+    html_parts = []
+
+    # 报告头部
+    html_parts.append('''
+    <div class="report-header">
+        <h1 class="report-title">智能电网分析报告</h1>
+        <div class="report-meta">
+            <p>生成时间: {}</p>
+            <p>包含表格: {}个</p>
+        </div>
+    </div>
+    '''.format(
+        datetime.now().strftime("%Y年%m月%d日 %H:%M:%S"),
+        len(selected_tables)
+    ))
+
+    # 报告概述
+    html_parts.append('''
+    <div class="report-section">
+        <h2>报告概述</h2>
+        <p>本报告基于智能电网系统的各项数据分析结果生成，包含选定的数据表格和分析内容。</p>
+    </div>
+    ''')
+
+    # 为每个选中的表格添加内容
+    for i, table_id in enumerate(selected_tables):
+        config = TABLE_CONFIG.get(table_id)
+        if not config:
+            continue
+
+        # 表格标题
+        html_parts.append(f'''
+        <div class="table-section" id="table-{table_id}">
+            <h3>{config['title']}</h3>
+        ''')
+
+        # 表格内容
+        try:
+            df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+            existing_columns = [col for col in config['columns'] if col in df.columns]
+            df = df[existing_columns]
+            df = df.fillna('')
+
+            # 生成HTML表格
+            table_html = df.to_html(
+                classes='report-table table table-striped table-bordered',
+                index=False,
+                escape=False
+            )
+            html_parts.append(table_html)
+
+            # 添加数据分析摘要
+            analysis_summary = generate_analysis_summary(df, table_id)
+            html_parts.append(f'''
+            <div class="analysis-summary">
+                <h4>数据分析摘要</h4>
+                {analysis_summary}
+            </div>
+            ''')
+
+        except Exception as e:
+            html_parts.append(f'<div class="alert alert-danger">读取表格数据时出错: {str(e)}</div>')
+
+        html_parts.append('</div>')
+
+        # 添加分页提示
+        if i < len(selected_tables) - 1:
+            html_parts.append('<div class="page-break"></div>')
+
+    # 报告总结
+    html_parts.append('''
+    <div class="report-summary">
+        <h2>报告总结</h2>
+        <p>以上为智能电网分析报告的全部内容。报告基于实际数据生成，反映了当前电网运行的各项指标和状态。</p>
+        <div class="signature">
+            <p>报告生成系统</p>
+            <p>智能电网分析平台</p>
+        </div>
+    </div>
+    ''')
+
+    return ''.join(html_parts)
+
+
+def generate_analysis_summary(df, table_id):
+    """根据表格数据生成分析摘要"""
+    if df.empty:
+        return "<p>暂无数据</p>"
+
+    # 基本统计信息
+    summary_parts = []
+    summary_parts.append(f"<p>数据记录总数: {len(df)} 条</p>")
+
+    # 数值列的统计分析
+    numeric_columns = df.select_dtypes(include=[np.number]).columns
+    if len(numeric_columns) > 0:
+        summary_parts.append("<h5>数值统计</h5>")
+        summary_parts.append("<ul>")
+        for col in numeric_columns[:3]:  # 只显示前3个数值列
+            if col in df.columns:
+                mean_val = df[col].mean()
+                max_val = df[col].max()
+                min_val = df[col].min()
+                summary_parts.append(f"<li>{col}: 平均{mean_val:.2f}, 最大{max_val:.2f}, 最小{min_val:.2f}</li>")
+        summary_parts.append("</ul>")
+
+    return ''.join(summary_parts)
+
+
+@app.route('/api/save-report-content', methods=['POST'])
+def save_report_content():
+    """保存用户编辑的报告内容"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+
+    data = request.get_json()
+    html_content = data.get('html_content', '')
+
+    try:
+        # 将编辑后的内容保存到session中
+        session['edited_report_content'] = html_content
+
+        return jsonify({
+            'success': True,
+            'message': '报告内容保存成功'
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'保存报告内容时出错: {str(e)}'
+        }), 500
+
+
+@app.route('/api/generate-full-report', methods=['POST'])
+def generate_full_report():
+    """生成包含多个表格的完整报告"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+
+    data = request.get_json()
+    selected_tables = data.get('tables', [])
+
+    try:
+        # 创建Word文档
+        doc = Document()
+
+        # 添加报告标题
+        title = doc.add_heading('智能电网分析报告', 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        # 添加报告生成时间
+        current_time = datetime.now().strftime("%Y年%m月%d日 %H:%M:%S")
+        time_paragraph = doc.add_paragraph(f"生成时间: {current_time}")
+        time_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        doc.add_paragraph()  # 空行
+
+        # 为每个选中的表格添加内容
+        for table_id in selected_tables:
+            config = TABLE_CONFIG.get(table_id)
+            if not config:
+                continue
+
+            # 添加表格标题
+            doc.add_heading(config['title'], level=1)
+
+            # 添加表格内容
+            try:
+                df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+                existing_columns = [col for col in config['columns'] if col in df.columns]
+                df = df[existing_columns]
+                df = df.fillna('')
+
+                # 创建表格
+                table = doc.add_table(rows=1, cols=len(df.columns))
+                table.style = 'Table Grid'
+
+                # 表头
+                hdr_cells = table.rows[0].cells
+                for i, col in enumerate(df.columns):
+                    hdr_cells[i].text = str(col)
+                    for paragraph in hdr_cells[i].paragraphs:
+                        for run in paragraph.runs:
+                            run.font.size = Pt(9)
+
+                # 数据行
+                for _, row in df.iterrows():
+                    row_cells = table.add_row().cells
+                    for i, val in enumerate(row):
+                        row_cells[i].text = str(val)
+                        for paragraph in row_cells[i].paragraphs:
+                            for run in paragraph.runs:
+                                run.font.size = Pt(9)
+
+            except Exception as e:
+                doc.add_paragraph(f"读取表格数据时出错: {str(e)}")
+
+            # 添加分页符（最后一个表格不加）
+            if table_id != selected_tables[-1]:
+                doc.add_page_break()
+
+        # 保存到内存流
+        out_stream = BytesIO()
+        doc.save(out_stream)
+        out_stream.seek(0)
+
+        # 保存文件到临时目录
+        temp_filename = f"report_{uuid.uuid4().hex}.docx"
+        temp_path = os.path.join(tempfile.gettempdir(), temp_filename)
+
+        with open(temp_path, 'wb') as f:
+            f.write(out_stream.getvalue())
+
+        # 将文件路径存入session，供下载使用
+        session['last_report_path'] = temp_path
+
+        return jsonify({
+            'success': True,
+            'message': '报告生成成功',
+            'filename': temp_filename
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'生成报告时出错: {str(e)}'
+        }), 500
+
+@app.route('/download-report')
+def download_report():
+    """下载生成的报告"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    file_path = session.get('last_report_path')
+    if not file_path or not os.path.exists(file_path):
+        return jsonify({'success': False, 'message': '报告文件不存在或已过期'}), 404
+
+    return send_file(file_path, as_attachment=True, download_name='智能电网分析报告.docx')
+
+@app.route('/cleanup-report')
+def cleanup_report():
+    """清理临时报告文件"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': '未授权'}), 401
+
+    file_path = session.get('last_report_path')
+    if file_path and os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+            session.pop('last_report_path', None)
+        except:
+            pass
+
+    return jsonify({'success': True, 'message': '清理完成'})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

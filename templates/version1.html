@@ -5,9 +5,6 @@
   <title>操作台</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <!-- 新增：引入导航栏样式-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
-
 </head>
 <body>
 <!-- 上传示例 -->
@@ -550,21 +547,21 @@
       <button>开关类型</button>
       <button>投运时间</button>
     </div>
-      <!-- 上传控件：位于分析区右下角 -->
-      <div class="upload-container upload-card">
-        <form id="uploadForm" enctype="multipart/form-data">
-          <label class="file-label">
-            <input type="file" id="fileInput" name="file" accept=".xlsx" required>
-            <span class="file-text">选择 Excel 文件 (.xlsx)</span>
-          </label>
-          <div class="upload-actions">
-            <button type="submit" class="upload-btn"><i class="fa fa-upload"></i> 上传</button>
-            <!-- 加上 id="export-btn" -->
-            <button type="button" class="export-btn" id="export-btn"><i class="fa fa-download"></i> 单文件导出</button>
-          </div>
-          <div id="uploadStatus" class="upload-status"></div>
-        </form>
-      </div>
+{#      <!-- 上传控件：位于分析区右下角 -->#}
+{#      <div class="upload-container upload-card">#}
+{#        <form id="uploadForm" enctype="multipart/form-data">#}
+{#          <label class="file-label">#}
+{#            <input type="file" id="fileInput" name="file" accept=".xlsx" required>#}
+{#            <span class="file-text">选择 Excel 文件 (.xlsx)</span>#}
+{#          </label>#}
+{#          <div class="upload-actions">#}
+{#            <button type="submit" class="upload-btn"><i class="fa fa-upload"></i> 上传</button>#}
+{#            <!-- 加上 id="export-btn" -->#}
+{#            <button type="button" class="export-btn" id="export-btn"><i class="fa fa-download"></i> 单文件导出</button>#}
+{#          </div>#}
+{#          <div id="uploadStatus" class="upload-status"></div>#}
+{#        </form>#}
+{#      </div>#}
     </div> <!-- .analysis-wrapper -->
   </div>
  <script src="{{ url_for('static', filename='js/script2.js') }}"></script>

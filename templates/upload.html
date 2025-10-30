@@ -1,4 +1,3 @@
-<!-- 修改 smart-grid-web/templates/upload.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -6,36 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数据上传 - 智能电网分析系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     {% include 'navbar.html' %}
 
-    <div class="upload-container">
-        <h1>数据上传</h1>
+    <div class="main-content">
+        <div class="upload-container">
+            <!-- 上传卡片 -->
+            <div class="upload-card">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <h3>拖拽文件到此处上传</h3>
+                    <p class="upload-hint">或 <span class="browse-btn">点击选择文件</span></p>
+                    <p class="file-format">支持 .xlsx, .xls 格式文件</p>
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                </div>
 
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">
-                <i class="bi bi-cloud-upload"></i>
+                <!-- 文件信息显示 -->
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <div class="file-details">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="file-text">
+                            <div class="file-name" id="fileName"></div>
+                            <div class="file-size" id="fileSize"></div>
+                        </div>
+                        <button class="file-remove" id="fileRemoveBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 上传按钮 -->
+                <button class="start-upload-btn" id="startUploadBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    <span>开始上传</span>
+                </button>
             </div>
-            <p>拖拽文件到此处或<span class="browse-btn">点击上传</span></p>
-            <p class="file-format">支持格式：.xlsx, .xls</p>
-            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+
+            <!-- 功能说明 -->
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>安全可靠</h4>
+                    <p>数据加密传输，确保信息安全</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>快速处理</h4>
+                    <p>智能解析，秒级完成数据导入</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>智能分析</h4>
+                    <p>自动生成专业分析报告</p>
+                </div>
+            </div>
+
+            <!-- 消息提示 -->
+            <div class="message" id="message"></div>
         </div>
-
-        <!-- 注释掉文件列表和进度条，因为不需要实际上传 -->
-        <!-- <div class="file-list" id="fileList"></div>
-        <div class="upload-progress" id="uploadProgress" style="display: none;">
-            <div class="progress-bar" id="progressBar"></div>
-            <div class="progress-text" id="progressText">0%</div>
-        </div> -->
-
-        <button class="start-upload-btn" id="startUploadBtn" disabled>开始上传</button>
-
-        <div class="message" id="message"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"></script>
     <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 </body>
 </html>

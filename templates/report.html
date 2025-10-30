@@ -48,6 +48,9 @@
 
             <!-- 操作面板 -->
             <div class="panel-actions">
+                <div class="selected-count mb-2">
+                    <small class="text-muted">已选择 <span id="selectedCount">0</span> 个表格</small>
+                </div>
                 <div class="action-buttons">
                     <button id="generateReport" class="btn btn-primary w-100 mb-2">
                         <i class="fas fa-sync-alt me-2"></i>生成报告
@@ -73,14 +76,11 @@
                     <i class="fas fa-file-alt me-2"></i>报告预览
                 </h5>
                 <div class="preview-actions">
-                    <button id="editReport" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-edit me-1"></i>编辑报告
-                    </button>
-                    <button id="saveReport" class="btn btn-outline-success btn-sm">
-                        <i class="fas fa-save me-1"></i>保存修改
-                    </button>
                     <button id="printReport" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-print me-1"></i>打印
+                        <i class="fas fa-print me-1"></i>打印报告
+                    </button>
+                    <button id="exportPreview" class="btn btn-outline-primary btn-sm" disabled>
+                        <i class="fas fa-external-link-alt me-1"></i>导出预览
                     </button>
                 </div>
             </div>
@@ -95,22 +95,45 @@
 
                 <!-- 报告统计信息 -->
                 <div id="reportStats" class="report-stats mt-4" style="display: none;">
+                    <div class="stats-header">
+                        <h6>报告统计信息</h6>
+                    </div>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number" id="tableCount">0</div>
-                            <div class="stat-label">表格数量</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-table"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="tableCount">0</div>
+                                <div class="stat-label">表格数量</div>
+                            </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number" id="dataCount">0</div>
-                            <div class="stat-label">数据总量</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="dataCount">0</div>
+                                <div class="stat-label">数据总量</div>
+                            </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number" id="pageCount">0</div>
-                            <div class="stat-label">预计页数</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="pageCount">0</div>
+                                <div class="stat-label">预计页数</div>
+                            </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number" id="fileSize">0 KB</div>
-                            <div class="stat-label">文件大小</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="fileSize">0 KB</div>
+                                <div class="stat-label">文件大小</div>
+                            </div>
                         </div>
                     </div>
                 </div>
