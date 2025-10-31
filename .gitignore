@@ -1,2 +1,12 @@
-/static/.idea/
-/tree.py
+# 忽略IDE配置文件（JetBrains系列，如PyCharm）
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# 忽略Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+tree.py

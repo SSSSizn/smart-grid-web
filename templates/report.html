@@ -5,134 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>报告预览 - 智能电网分析系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .content-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .combined-sidebar {
+            width: 350px;
+            flex: 0 0 350px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+        }
+
+        .resizer {
+            width: 8px;
+            background: #e9ecef;
+            cursor: col-resize;
+            flex: 0 0 8px;
+            border-left: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .resizer:hover {
+            background: #007bff;
+        }
+    </style>
 </head>
 <body>
     {% include 'navbar.html' %}
 
-    <div class="report-container">
-        <!-- 左侧表格选择面板 -->
-        <div class="sidebar-panel">
-            <div class="panel-header">
-                <h5 class="panel-title">
-                    <i class="fas fa-table me-2"></i>选择表格
-                </h5>
-            </div>
-            <div class="panel-body">
-                <div class="search-box mb-3">
-                    <input type="text" id="tableSearch" class="form-control" placeholder="搜索表格...">
+    <div class="main-container">
+        <div class="content-container">
+            <!-- 左侧合并的目录导航和表格选择 -->
+            <div class="combined-sidebar">
+                <div class="sidebar-header p-3 border-bottom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table me-2"></i>表格选择导航
+                    </h5>
                 </div>
-                <div class="table-selection">
-                    <div class="select-all mb-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="selectAll">
-                            <label class="form-check-label" for="selectAll">
-                                全选
-                            </label>
+
+                <!-- 搜索和操作栏 -->
+                <div class="sidebar-toolbar p-3 border-bottom">
+                    <div class="search-box mb-3">
+                        <input type="text" id="navSearch" class="form-control" placeholder="搜索表格或目录...">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="selection-info">
+                            <small class="text-muted">已选择 <span id="selectedCount">0</span> 个表格</small>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="selectAll" class="btn btn-outline-primary btn-sm me-1" title="全选">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                            <button id="clearSelection" class="btn btn-outline-secondary btn-sm" title="清除选择">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="table-list-container">
-                        <div id="tableList" class="table-list">
-                            <!-- 表格列表将通过JavaScript动态加载 -->
-                            <div class="loading-tables">
-                                <div class="spinner-border spinner-border-sm" role="status">
-                                    <span class="visually-hidden">加载中...</span>
+                </div>
+
+                <!-- 目录导航内容 -->
+                <div class="sidebar-content flex-fill overflow-auto">
+                    <div class="navigation-tree p-3">
+                        <ul class="nav-tree">
+                            <li class="has-submenu">第二章 配电网现状分析
+                                <ul class="submenu">
+                                    <li class="has-submenu">一、高压配电网现状分析
+                                        <ul class="submenu">
+                                            <li class="has-submenu">（一）电网总体概况</li>
+                                            <li class="has-submenu">（二）装备水平分析
+                                                <ul class="submenu">
+                                                    <li data-table="2-1" class="nav-table-item">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input table-checkbox" value="2-1" id="table-2-1">
+                                                            <label class="form-check-label" for="table-2-1">表2-1 xx网格35kV及以上变电站基本情况表</label>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="has-submenu">（三）运行水平分析
+                                                <ul class="submenu">
+                                                    <li data-table="2-2" class="nav-table-item">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input table-checkbox" value="2-2" id="table-2-2">
+                                                            <label class="form-check-label" for="table-2-2">表2-2 xx网格各变电站主变运行水平表</label>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-submenu">二、中低压配电网现状分析
+                                        <ul class="submenu">
+                                            <li class="has-submenu">（一）供电能力
+                                                <ul class="submenu">
+                                                    <li class="has-submenu">1、人均（户均）配变容量
+                                                        <ul class="submenu">
+                                                            <li data-table="2-3" class="nav-table-item">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input table-checkbox" value="2-3" id="table-2-3">
+                                                                    <label class="form-check-label" for="table-2-3">表2-3 低压电网规模一览表</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="has-submenu">2、配变负载情况
+                                                        <ul class="submenu">
+                                                            <li data-table="2-4" class="nav-table-item">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input table-checkbox" value="2-4" id="table-2-4">
+                                                                    <label class="form-check-label" for="table-2-4">表2-4 配变负载率明细表</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="has-submenu">3、配电线路负载情况
+                                                        <ul class="submenu">
+                                                            <li data-table="2-5" class="nav-table-item">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input table-checkbox" value="2-5" id="table-2-5">
+                                                                    <label class="form-check-label" for="table-2-5">表2-5 中压线路负载率明细表</label>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <!-- 继续集成其他目录结构 -->
+                                            <!-- 这里省略了部分重复结构，实际中需要完整集成 -->
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 底部操作栏 -->
+                <div class="sidebar-footer p-3 border-top bg-light">
+                    <div class="export-options mb-3">
+                        <label class="form-label small fw-bold">导出格式</label>
+                        <select id="exportFormat" class="form-select form-select-sm">
+                            <option value="word">Word 文档 (.docx)</option>
+                            <option value="pdf">PDF 文档 (.pdf)</option>
+                        </select>
+                    </div>
+                    <div class="action-buttons d-grid gap-2">
+                        <button id="generateReport" class="btn btn-primary" disabled>
+                            <i class="fas fa-sync-alt me-2"></i>生成报告
+                        </button>
+                        <button id="downloadReport" class="btn btn-success" disabled>
+                            <i class="fas fa-download me-2"></i>下载报告
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 可拖拽分隔条 -->
+            <div class="resizer" id="sidebarResizer"></div>
+
+            <!-- 右侧预览区域 -->
+            <div class="preview-panel">
+                <div class="preview-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <h5 class="preview-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>报告预览
+                    </h5>
+                    <div class="preview-actions">
+                        <button id="printReport" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-print me-1"></i>打印报告
+                        </button>
+                        <button id="exportPreview" class="btn btn-outline-primary btn-sm" disabled>
+                            <i class="fas fa-external-link-alt me-1"></i>导出预览
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-body flex-fill overflow-auto">
+                    <div id="reportPreview" class="report-preview p-4">
+                        <div class="empty-preview text-center py-5">
+                            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">请选择表格并生成报告</h5>
+                            <p class="text-muted">在左侧选择要包含在报告中的表格，然后点击"生成报告"</p>
+                        </div>
+                    </div>
+
+                    <!-- 报告统计信息 -->
+                    <div id="reportStats" class="report-stats mt-4 p-3 border-top" style="display: none;">
+                        <div class="stats-header">
+                            <h6>报告统计信息</h6>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-table"></i>
                                 </div>
-                                <span class="ms-2">加载表格列表中...</span>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="tableCount">0</div>
+                                    <div class="stat-label">表格数量</div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 操作面板 -->
-            <div class="panel-actions">
-                <div class="selected-count mb-2">
-                    <small class="text-muted">已选择 <span id="selectedCount">0</span> 个表格</small>
-                </div>
-                <div class="action-buttons">
-                    <button id="generateReport" class="btn btn-primary w-100 mb-2">
-                        <i class="fas fa-sync-alt me-2"></i>生成报告
-                    </button>
-                    <button id="downloadReport" class="btn btn-success w-100" disabled>
-                        <i class="fas fa-download me-2"></i>下载报告
-                    </button>
-                </div>
-                <div class="export-options mt-3">
-                    <label class="form-label">导出格式</label>
-                    <select id="exportFormat" class="form-select">
-                        <option value="word">Word 文档 (.docx)</option>
-                        <option value="pdf">PDF 文档 (.pdf)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- 右侧预览区域 -->
-        <div class="preview-panel">
-            <div class="preview-header">
-                <h5 class="preview-title">
-                    <i class="fas fa-file-alt me-2"></i>报告预览
-                </h5>
-                <div class="preview-actions">
-                    <button id="printReport" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-print me-1"></i>打印报告
-                    </button>
-                    <button id="exportPreview" class="btn btn-outline-primary btn-sm" disabled>
-                        <i class="fas fa-external-link-alt me-1"></i>导出预览
-                    </button>
-                </div>
-            </div>
-            <div class="preview-body">
-                <div id="reportPreview" class="report-preview">
-                    <div class="empty-preview">
-                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">请选择表格并生成报告</h5>
-                        <p class="text-muted">在左侧选择要包含在报告中的表格，然后点击"生成报告"</p>
-                    </div>
-                </div>
-
-                <!-- 报告统计信息 -->
-                <div id="reportStats" class="report-stats mt-4" style="display: none;">
-                    <div class="stats-header">
-                        <h6>报告统计信息</h6>
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-table"></i>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="dataCount">0</div>
+                                    <div class="stat-label">数据总量</div>
+                                </div>
                             </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="tableCount">0</div>
-                                <div class="stat-label">表格数量</div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="pageCount">0</div>
+                                    <div class="stat-label">预计页数</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-database"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="dataCount">0</div>
-                                <div class="stat-label">数据总量</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-file"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="pageCount">0</div>
-                                <div class="stat-label">预计页数</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-hdd"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="fileSize">0 KB</div>
-                                <div class="stat-label">文件大小</div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-hdd"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="fileSize">0 KB</div>
+                                    <div class="stat-label">文件大小</div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -386,63 +386,164 @@ def upload():
     return render_template('upload.html')
 
 
-# 生成报告内容
-@app.route('/generate_report', methods=['POST'])
-def generate_report():
-    # 检查登录状态
+# 预览页面文字编辑
+@app.route('/api/save-table-description', methods=['POST'])
+def save_table_description():
+    """保存表格描述文字"""
     if 'user' not in session:
         return jsonify({'success': False, 'message': '请先登录'}), 401
 
     data = request.get_json()
-    tables = data.get('tables', [])
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
+    table_id = data.get('table_id')
+    content = data.get('content', '')
 
-    # 生成报告HTML
-    report_html = '<div class="report-intro">'
-    report_html += '<h2>报告概述</h2>'
-    report_html += '<p>本报告包含智能电网系统的各项数据分析结果，基于所选表格数据生成。</p>'
-    if start_date and end_date:
-        report_html += f'<p>数据时间范围: {start_date} 至 {end_date}</p>'
-    report_html += '</div>'
+    if not table_id:
+        return jsonify({'success': False, 'message': '表格ID不能为空'}), 400
 
-    # 为每个选中的表格生成报告部分
-    for table_id in tables:
-        # 这里应该根据实际表格数据生成内容
-        report_html += f'<div class="report-section">'
-        report_html += f'<h2>{get_table_title(table_id)}</h2>'
+    try:
+        save_path = get_save_path(table_id)
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(content)
 
-        # 模拟表格数据
-        df = process_excel_data()
-        if not df.empty:
-            # 添加表格
-            report_html += '<div class="table-container">'
-            report_html += '<table class="data-table">'
-            # 表头
-            report_html += '<thead><tr>'
-            for col in df.columns:
-                report_html += f'<th>{col}</th>'
-            report_html += '</tr></thead>'
-            # 表体
-            report_html += '<tbody>'
-            for _, row in df.iterrows():
-                report_html += '<tr>'
-                for val in row:
-                    report_html += f'<td>{val}</td>'
-                report_html += '</tr>'
-            report_html += '</tbody></table></div>'
+        return jsonify({
+            'success': True,
+            'message': '描述内容保存成功'
+        })
 
-            # 添加图表
-            report_html += '<div class="chart-container">'
-            report_html += f'<h3>{get_table_title(table_id)} - 负载率分析</h3>'
-            report_html += '<img src="/static/images/sample-chart.png" alt="负载率分析图表">'
-            report_html += '</div>'
-        else:
-            report_html += '<p>暂无该表格的数据。</p>'
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'保存描述内容时出错: {str(e)}'
+        }), 500
 
-        report_html += '</div>'
 
-    return jsonify({'success': True, 'report_html': report_html})
+# 生成报告内容
+@app.route('/generate_report', methods=['POST'])
+def generate_html_report(selected_tables):
+    """生成HTML格式的报告内容"""
+    from datetime import datetime
+    html_parts = []
+
+    # 报告头部
+    html_parts.append('''
+    <div class="report-header">
+        <h1 class="report-title">智能电网分析报告</h1>
+        <div class="report-meta">
+            <p>生成时间: {}</p>
+            <p>包含表格: {}个</p>
+        </div>
+    </div>
+    '''.format(
+        datetime.now().strftime("%Y年%m月%d日 %H:%M:%S"),
+        len(selected_tables)
+    ))
+
+    # 报告概述
+    html_parts.append('''
+    <div class="report-section">
+        <h2>报告概述</h2>
+        <p>本报告基于智能电网系统的各项数据分析结果生成，包含选定的数据表格和分析内容。</p>
+    </div>
+    ''')
+
+    # 为每个选中的表格添加内容
+    for i, table_id in enumerate(selected_tables):
+        config = TABLE_CONFIG.get(table_id)
+        if not config:
+            continue
+
+        # 表格标题
+        html_parts.append(f'''
+        <div class="table-section" id="table-{table_id}">
+            <h3>{config['title']}</h3>
+        ''')
+
+        # 添加表格对应的文字内容
+        try:
+            save_path = get_save_path(table_id)
+            with open(save_path, "r", encoding="utf-8") as f:
+                text_content = f.read()
+
+            if text_content and text_content != "暂无内容，可以点击编辑并保存。":
+                html_parts.append(f'''
+                <div class="table-description editable-text" data-table-id="{table_id}">
+                    <div class="description-content">{text_content}</div>
+                    <div class="edit-controls" style="display: none;">
+                        <textarea class="form-control description-edit" rows="4">{text_content}</textarea>
+                        <div class="edit-actions mt-2">
+                            <button class="btn btn-success btn-sm save-description" data-table-id="{table_id}">保存</button>
+                            <button class="btn btn-secondary btn-sm cancel-edit">取消</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm edit-description-btn">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                </div>
+                ''')
+        except FileNotFoundError:
+            # 如果没有文字内容，提供一个空的编辑区域
+            html_parts.append(f'''
+            <div class="table-description editable-text" data-table-id="{table_id}">
+                <div class="description-content">暂无内容描述。</div>
+                <div class="edit-controls" style="display: none;">
+                    <textarea class="form-control description-edit" rows="4" placeholder="请输入表格描述内容..."></textarea>
+                    <div class="edit-actions mt-2">
+                        <button class="btn btn-success btn-sm save-description" data-table-id="{table_id}">保存</button>
+                        <button class="btn btn-secondary btn-sm cancel-edit">取消</button>
+                    </div>
+                </div>
+                <button class="btn btn-outline-primary btn-sm edit-description-btn">
+                    <i class="fas fa-edit"></i> 编辑
+                </button>
+            </div>
+            ''')
+
+        # 表格内容
+        try:
+            df = pd.read_excel(EXCEL_FILE, sheet_name=config['sheet_name'])
+            existing_columns = [col for col in config['columns'] if col in df.columns]
+            df = df[existing_columns]
+            df = df.fillna('')
+
+            # 生成HTML表格
+            table_html = df.to_html(
+                classes='report-table table table-striped table-bordered',
+                index=False,
+                escape=False
+            )
+            html_parts.append(table_html)
+
+            # 添加数据分析摘要
+            analysis_summary = generate_analysis_summary(df, table_id)
+            html_parts.append(f'''
+            <div class="analysis-summary">
+                <h4>数据分析摘要</h4>
+                {analysis_summary}
+            </div>
+            ''')
+
+        except Exception as e:
+            html_parts.append(f'<div class="alert alert-danger">读取表格数据时出错: {str(e)}</div>')
+
+        html_parts.append('</div>')
+
+        # 添加分页提示
+        if i < len(selected_tables) - 1:
+            html_parts.append('<div class="page-break"></div>')
+
+    # 报告总结
+    html_parts.append('''
+    <div class="report-summary">
+        <h2>报告总结</h2>
+        <p>以上为智能电网分析报告的全部内容。报告基于实际数据生成，反映了当前电网运行的各项指标和状态。</p>
+        <div class="signature">
+            <p>报告生成系统</p>
+            <p>智能电网分析平台</p>
+        </div>
+    </div>
+    ''')
+
+    return ''.join(html_parts)
 
 
 @app.route('/report_preview', methods=['GET'])
